@@ -1,0 +1,5 @@
+pip install 
+tabula-py
+JPype1
+
+Instalar java
