@@ -46,6 +46,26 @@ def extrair_valores_na_linha(pdf_path, termo_pesquisa):
 
                 valores.append(valor)
     return valores
+
+# Converter os valores formatados em Real(R$ 1.000,00) para Float(1000.00)
+def converter_valores_reais(valores):
+    valores_float = []
+    #print(valores)
+    print(len(valores))
+    posicao = 0
+    for valor in valores:
+        if valor=='valor':
+            print('Achou')
+            del valores[posicao]
+        posicao = posicao+1
+        valor_sem_cifrao = valor.replace('r$ ', '')
+        valor_sem_ponto = valor_sem_cifrao.replace('.', '')
+        valor_convertido = valor_sem_ponto.replace(',', '.')
+        valores_float.append(valor_convertido)
+    #print(valores_float)
+    print(len(valores_float))
+    return valores_float
+
 # Converter os valores formatados em Real(R$ 1.000,00) para Float(1000.00)
 def converter_valores(valores):
     valores_float = []
@@ -72,7 +92,6 @@ def formatar_valor_real(valor):
 
     return valor_formatado
 
-#if __name__ == "__main__":
 def execucao(palavra_chave,arquivo_selecionado):
     pdf_path = "static/arquivos/"+arquivo_selecionado
     valores = extrair_valores_na_linha(pdf_path, palavra_chave)

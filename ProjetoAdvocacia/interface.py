@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for
 
 import os
 from app import *
+from word import *
 
 app = Flask(__name__)
 app.secret_key = 'key123'
@@ -26,22 +27,35 @@ def fechar_notificacao():
 @app.route('/buscar_valores', methods=['GET', 'POST'])
 def buscar_valores():
     arquivo_selecionado = request.form['arquivo_selecionado']
-    print(arquivo_selecionado[:8])
+    #print(arquivo_selecionado[:8])
     if arquivo_selecionado[:8]=='excluir-':
         resposta = apagar_arquivo(arquivo_selecionado[8:])
         session['notificacao'] = resposta
         return index()
-    return render_template('index.html',arquivo_selecionado=arquivo_selecionado)
+    tipo = arquivo_selecionado.split('.')
+    tipo = tipo[1]
+    #print(tipo)
+    return render_template('index.html',arquivo_selecionado=arquivo_selecionado, tipo=tipo)
 
 @app.route('/encontrar_valores', methods=['GET', 'POST'])
 def encontrar_valores():
     palavra_chave = request.form['palavra_chave']
     arquivo_selecionado = request.form['arquivo_selecionado']
-
-    # Buscar no pdf
-    total = execucao(palavra_chave,arquivo_selecionado)
-
-    return render_template('index.html', total=total, palavra_chave=palavra_chave, arquivo_selecionado=arquivo_selecionado)
+    tipo = arquivo_selecionado.split('.')
+    tipo = tipo[1]
+    #print(tipo)
+    if tipo=='pdf':
+        # Buscar no pdf
+        total_real = execucao(palavra_chave,arquivo_selecionado)
+    elif tipo=='docx':
+        caminho_arquivo_word = 'static/arquivos/'+arquivo_selecionado
+        palavra_chave = [palavra_chave]
+        dados = encontrar_e_armazenar_linhas(caminho_arquivo_word, palavra_chave)
+        print(dados[1])
+        valores = converter_valores_reais(dados[1])
+        total = somar_valores(valores)
+        total_real = formatar_valor_real(total)
+    return render_template('index.html', total=total_real, palavra_chave=palavra_chave[0], arquivo_selecionado=arquivo_selecionado)
 
 UPLOAD_FOLDER_SLOT = 'static/arquivos'
 app.config['UPLOAD_FOLDER_SLOT'] = UPLOAD_FOLDER_SLOT

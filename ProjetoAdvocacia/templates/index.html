@@ -5,7 +5,7 @@
 {% endblock %}
 <!-- Body -->
 {% block menu %}
-    <form class="form-voltar" method="post" action="{{ url_for('navegar') }}">
+    <form method="post" action="{{ url_for('navegar') }}">
         <button class="botoes-menu" name="menu" value="home">
             Adicionar arquivo
         </button>
@@ -20,6 +20,11 @@
     </form>
 {% endblock %}
 {% block container %}
+    <div class="loading" id="loading">
+        <img src="{{ url_for('static', filename='images/loading.gif') }}" alt="Carregando...">
+        <h1>Processando...</h1>
+        <h2>Não vai demorar muito</h2>
+    </div>
     {% if palavra_chave %}
         <h1>{{palavra_chave}}</h1>
     {% endif %}
@@ -28,11 +33,16 @@
     {% endif %}
     <br>
     {% if arquivo_selecionado %}
-        <h1>{{arquivo_selecionado}}</h1>
+        {% if tipo=='pdf' %}
+            <img class="imagem-tipo" src="{{ url_for('static', filename='images/icone-pdf.png') }}">
+        {% elif tipo=='docx' %}
+            <img class="imagem-tipo" src="{{ url_for('static', filename='images/icone-docx.png') }}">
+        {% endif %}
+        <h1 class="nome-arquivo">{{arquivo_selecionado}}</h1>
         <form class="form-voltar" method="post" action="{{ url_for('encontrar_valores') }}">
             <input type="text" name="palavra_chave" placeholder="Digite a palavra-chave">
             <input class="esconder" type="text" id="arquivo_selecionado" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
-            <button>
+            <button onclick="mostrarLoading()">
                 <img class="icone-botao-slot" src="{{ url_for('static', filename='images/icone-pesquisa.png') }}">
             </button>
         </form>
@@ -48,7 +58,7 @@
         </form>
         <br>
         <form class="form-dropzone" method="post" enctype="multipart/form-data" action="{{ url_for('uploadDrop') }}">
-            <div class="dropzone" title="Selecionar arquivo" id="dropzone" ondragenter="handleDragEnter(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+            <div class="dropzone" title="Arraste e solte o arquivo aqui ou clique no botão para procurar" id="dropzone" ondragenter="handleDragEnter(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
                 <h3>Arraste e solte o arquivo aqui</h3>
                 <h3>ou</h3>
                 <label for="arquivo" class="label-upload">
@@ -116,6 +126,15 @@
 
             // Altera dinamicamente o caminho da imagem
             imagem.src = novoCaminho;
+        }
+    </script>
+    <script>
+        function mostrarLoading() {
+            escondermenu()
+            document.getElementById('loading').style.display = 'block';
+        }
+        function escondermenu() {
+            document.getElementById('menubar').style.display = 'none';
         }
     </script>
 {% endblock %}
