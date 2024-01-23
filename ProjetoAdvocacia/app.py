@@ -45,6 +45,8 @@ def converter_valores_reais(valores):
 def converter_valores(valores):
     valores_float = []
     for valor in valores:
+        if valor[:3]=='R$ ':
+            valor = valor[3:]
         valor_sem_ponto = valor.replace('.', '')
         valor_convertido = valor_sem_ponto.replace(',', '.')
         valores_float.append(valor_convertido)

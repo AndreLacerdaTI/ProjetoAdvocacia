@@ -20,18 +20,36 @@
     </form>
 {% endblock %}
 {% block container %}
+<br>
+<h1>Palavras chave</h1>
+<button class="botao-filtros">Adicionar</button><br><br>
+{% if filtros %}
+    {% for filtro in filtros %}
+        <button class="botao-filtros">{{filtro[1]}}</button>
+    {% endfor %}
+{% endif %}
+ <!--
+<table>
+    <thead>
+        <tr>
+            <th>Palavra chave</th>
+            <th>Ativado / Desativado</th>
+        </tr>
+    </thead>
+    <tbody>
     {% if filtros %}
         {% for filtro in filtros %}
-            <br>
-            <div class="opcao-filtros">
-                <H1>{{filtro[1]}}</H1>
-                <div class="checkbox-wrapper-2">
-                    <input type="checkbox" class="sc-gJwTLC ikxBAC">
-                </div>
-            </div>
+            <tr>
+                <td>{{filtro[1]}}
+                    <div class="checkbox-wrapper-2">
+                        <input type="checkbox" class="sc-gJwTLC ikxBAC">
+                    </div>
+                </td>
+            </tr>
         {% endfor %}
     {% endif %}
-    
+    </tbody>
+</table>
     <style>
         .checkbox-wrapper-2 .ikxBAC {
         appearance: none;
@@ -96,5 +114,5 @@
         background-color: #6a6fff;
         }
     </style>
-  
+-->   
   {% endblock %}

@@ -13,7 +13,6 @@ body {
 
 .loading{
     width: 100%;
-    height: 100%;
     background-color: #3034BE;
     display: none;
     position: absolute;
@@ -224,14 +223,33 @@ input[type="file"] {
     background-color: #ffffff;
 }
 
-.opcao-filtros {
-    display: flex;
-    width: 400px;
+.botao-filtros {
+    width: 200px;
     height: 50px;
     text-align: center;
     align-items: center;
     justify-content:space-around;
     background-color: #ffffff;
     border: 2px solid #3034BE ;
-    border-radius: 20px;
+    color: #3034BE;
+    font-weight: bold;
+    border-radius: 40px;
+}
+
+table {
+    width: 80%;
+}
+table tr th{
+    background-color: #3034BE;
+    color: #fff;
+    width: 50%;
+}
+table tr td {
+    align-items: center;
+    text-align: center;
+    width: 50%;
+    border: 1px solid #dddddd;
+}
+table tr:hover {
+    background-color: #d7d7d7;
 }

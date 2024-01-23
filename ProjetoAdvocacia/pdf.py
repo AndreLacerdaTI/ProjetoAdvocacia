@@ -35,3 +35,14 @@ def execucao(palavra_chave,arquivo_selecionado):
     print('Encontrados: ',len(valores))
     print('Total dos itens "%s": R$ %s' % (palavra_chave,total_real))
     return total_real
+
+def extrair_palavras_chave(pdf_path):
+    palavras_chave = []
+    # Extrair tabelas do PDF
+    tabelas = tabula.read_pdf(pdf_path, pages='all', multiple_tables=True)
+    for tabela_numero, tabela in enumerate(tabelas):
+        for linha in tabela.itertuples():
+            dados = linha.split(' ')
+        print(dados)
+        palavras_chave = dados
+    return palavras_chave

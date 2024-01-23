@@ -37,7 +37,7 @@ def buscar_filtros():
     # Criar um cursor para executar comandos SQL
     cursor = conn.cursor()
     # Consultar todas as palavras-chave com suas derivações
-    cursor.execute("SELECT p.id, p.palavra_chave, d.derivacao FROM PalavraChave p LEFT JOIN Derivacao d ON p.id = d.palavra_chave_id")
+    cursor.execute("SELECT p.id, p.palavra_chave, d.derivacao FROM PalavraChave p LEFT JOIN Derivacao d ON p.id = d.palavra_chave_id ORDER BY p.palavra_chave")
     resultados = cursor.fetchall()
     return resultados
 """

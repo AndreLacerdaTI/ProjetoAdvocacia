@@ -1,10 +1,13 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 
 import os
+
 from app import *
 from word import *
 from pdf import *
 from scripts.banco import *
+from lerPDF import *
+from converter_word_pdf import *
 
 app = Flask(__name__)
 app.secret_key = 'key123'
@@ -30,8 +33,8 @@ def fechar_notificacao():
     session.pop('notificacao', None)
     return index()
 
-@app.route('/buscar_valores', methods=['GET', 'POST'])
-def buscar_valores():
+@app.route('/escolher_arquivo', methods=['GET', 'POST'])
+def escolher_arquivo():
     arquivo_selecionado = request.form['arquivo_selecionado']
     #print(arquivo_selecionado[:8])
     if arquivo_selecionado[:8]=='excluir-':
@@ -41,7 +44,13 @@ def buscar_valores():
     tipo = arquivo_selecionado.split('.')
     tipo = tipo[1]
     #print(tipo)
-    return render_template('index.html',arquivo_selecionado=arquivo_selecionado, tipo=tipo)
+    if tipo=='docx':
+        print('Converter')
+        resposta = converter('static/arquivos/'+arquivo_selecionado)
+        apagar_arquivo(arquivo_selecionado)
+        session['notificacao'] = 'Documento %s foi convertido para PDF !'% arquivo_selecionado
+        return index()
+    return render_template('index.html',arquivo_selecionado=arquivo_selecionado, tipo=tipo,palavras_chave=['teste','teste'])
 
 @app.route('/encontrar_valores', methods=['GET', 'POST'])
 def encontrar_valores():
@@ -49,19 +58,33 @@ def encontrar_valores():
     arquivo_selecionado = request.form['arquivo_selecionado']
     tipo = arquivo_selecionado.split('.')
     tipo = tipo[1]
-    #print(tipo)
     if tipo=='pdf':
         # Buscar no pdf
-        total_real = execucao(palavra_chave,arquivo_selecionado)
+        #total_real = execucao(palavra_chave,arquivo_selecionado)
+        #palavras_chave = extrair_palavras_chave('static/arquivos/'+arquivo_selecionado)
+        palavras_chave = ['Material de Consumo','Auxílio Transporte','Auxílio Alimentação','Internet']
+        dados = dados_pdf(arquivo_selecionado,palavras_chave)
+        for dado in dados:
+            print(dado['palavra_chave'])
+            print(dado['total'])
+            #print('Somente a primeira posicao: ',dado['informacoes'][0][0])
+            print('\n')
+            # Formato das informações do dicionario
+            '''
+            dicionario = {  'palavra_chave':'exemplo',
+                            'total':'total',
+                            'informacoes': 'dicionario={'pagina':pagina,'valor':valor}'
+                            }'''  
+        return render_template('index.html', arquivo_selecionado=arquivo_selecionado, dados_encontrados=dados)     
+
     elif tipo=='docx':
-        caminho_arquivo_word = 'static/arquivos/'+arquivo_selecionado
         palavra_chave = [palavra_chave]
-        dados = encontrar_e_armazenar_linhas(caminho_arquivo_word, palavra_chave)
-        print(dados[1])
+        dados = dados_word(arquivo_selecionado, palavra_chave)
+        print(dados)
         valores = converter_valores_reais(dados[1])
         total = somar_valores(valores)
         total_real = formatar_valor_real(total)
-    return render_template('index.html', total=total_real, palavra_chave=palavra_chave[0], arquivo_selecionado=arquivo_selecionado)
+    return render_template('index.html', total=total_real, palavra_chave=palavra_chave, arquivo_selecionado=arquivo_selecionado, dados_encontrados=0)
 
 UPLOAD_FOLDER_SLOT = 'static/arquivos'
 app.config['UPLOAD_FOLDER_SLOT'] = UPLOAD_FOLDER_SLOT
