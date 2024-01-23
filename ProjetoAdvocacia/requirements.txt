@@ -1,5 +1,6 @@
 pip install 
 tabula-py
 JPype1
+python-docx
 
 Instalar java

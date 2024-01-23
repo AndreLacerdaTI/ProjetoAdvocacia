@@ -14,8 +14,8 @@
             Selecionar arquivo
         </button>
         >
-        <button class="botoes-menu" name="menu" value="home">
-            Realizar busca
+        <button class="botoes-menu" name="menu" value="filtros">
+            Definir busca
         </button>
     </form>
 {% endblock %}
@@ -48,29 +48,33 @@
         </form>
     {% else %}
         <!-- Arquivos -->
-        <form class="form-botoes-arquivos" method="post" action="{{ url_for('buscar_valores') }}">
-            {% for arquivo in arquivos_armazenados %}
-                <button class="botoes-arquivos" name="arquivo_selecionado" value="{{arquivo}}">{{arquivo}}</button>
-                <button class="botao-excluir-arquivos" name="arquivo_selecionado" value="excluir-{{arquivo}}">
-                    <img src="{{ url_for('static', filename='images/icone-excluir.png') }}">
+        <div class="container">
+            <form class="form-botoes-arquivos" method="post" action="{{ url_for('buscar_valores') }}">
+                <h1>Arquivos salvos</h1>
+                {% for arquivo in arquivos_armazenados %}
+                    <button class="botoes-arquivos" name="arquivo_selecionado" value="{{arquivo}}">{{arquivo}}</button>
+                    <button class="botao-excluir-arquivos" name="arquivo_selecionado" value="excluir-{{arquivo}}">
+                        <img src="{{ url_for('static', filename='images/icone-excluir.png') }}">
+                    </button>
+                {% endfor %}
+            </form>
+            <br>
+            <form class="form-dropzone" method="post" enctype="multipart/form-data" action="{{ url_for('uploadDrop') }}">
+                <h1>Adicionar novo</h1>
+                <div class="dropzone" title="Arraste e solte o arquivo aqui ou clique no botão para procurar" id="dropzone" ondragenter="handleDragEnter(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                    <h3>Arraste e solte o arquivo aqui</h3>
+                    <h3>ou</h3>
+                    <label for="arquivo" class="label-upload">
+                        <img id="icone-botao-upload" src="{{ url_for('static', filename='images/icone-upload.png') }}"><br>
+                        <a id="botao-upload">Encontrar arquivo</a>
+                    </label>
+                    <input type="file" name="file" id="arquivo" style="display:none" onchange="atualizarBotaoTexto(this)">
+                </div>
+                <button type="submit" class="botao-salvar-slot" name="botaoSalvar" value="{{file}}" title="Salvar arquivo carregado">
+                    <img class="icone-botao-slot" src="{{ url_for('static', filename='images/icone-salvar.png') }}">
                 </button>
-            {% endfor %}
-        </form>
-        <br>
-        <form class="form-dropzone" method="post" enctype="multipart/form-data" action="{{ url_for('uploadDrop') }}">
-            <div class="dropzone" title="Arraste e solte o arquivo aqui ou clique no botão para procurar" id="dropzone" ondragenter="handleDragEnter(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-                <h3>Arraste e solte o arquivo aqui</h3>
-                <h3>ou</h3>
-                <label for="arquivo" class="label-upload">
-                    <img id="icone-botao-upload" src="{{ url_for('static', filename='images/icone-upload.png') }}"><br>
-                    <a id="botao-upload">Encontrar arquivo</a>
-                </label>
-                <input type="file" name="file" id="arquivo" style="display:none" onchange="atualizarBotaoTexto(this)">
-            </div>
-            <button type="submit" class="botao-salvar-slot" name="botaoSalvar" value="{{file}}" title="Salvar arquivo carregado">
-                <img class="icone-botao-slot" src="{{ url_for('static', filename='images/icone-salvar.png') }}">
-            </button>
-        </form>
+            </form>
+        </div>
     {% endif %}
     <script>
         function handleDragOver(event) {

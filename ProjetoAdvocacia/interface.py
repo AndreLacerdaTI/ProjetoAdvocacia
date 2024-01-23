@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, session, redirect, url_for
 import os
 from app import *
 from word import *
+from pdf import *
+from scripts.banco import *
 
 app = Flask(__name__)
 app.secret_key = 'key123'
@@ -17,6 +19,10 @@ def navegar():
     menu = request.form['menu']
     if menu == 'home':
         return index()
+    if menu == 'filtros':
+        filtros = buscar_filtros()
+        return render_template('filtros.html', filtros=filtros)
+
 
 @app.route('/fechar_notificacao', methods=['GET', 'POST'])
 def fechar_notificacao():
