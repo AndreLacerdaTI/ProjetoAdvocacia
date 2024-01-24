@@ -14,24 +14,31 @@ app.secret_key = 'key123'
 
 @app.route('/')
 def index():
+    session['ultima_tela'] = 'home'
     arquivos_armazenados = listarDiretorio()
     return render_template('index.html',arquivos_armazenados=arquivos_armazenados)
 
 @app.route('/navegar', methods=['GET', 'POST'])
 def navegar():
-    menu = request.form['menu']
+    try:
+        menu = request.form['menu']
+    except:
+        menu = session.get('ultima_tela', 'index')
     if menu == 'home':
         return index()
     if menu == 'filtros':
-        filtros = buscar_filtros()
-        return render_template('filtros.html', filtros=filtros)
+        return filtros()
 
 
 @app.route('/fechar_notificacao', methods=['GET', 'POST'])
 def fechar_notificacao():
     #notificacao = request.form['notificacao']
     session.pop('notificacao', None)
-    return index()
+    ultima_tela = session.get('ultima_tela', 'home')
+    print(ultima_tela)
+    #return render_template('%s.html'% ultima_tela)
+    return navegar()
+
 
 @app.route('/escolher_arquivo', methods=['GET', 'POST'])
 def escolher_arquivo():
@@ -110,6 +117,79 @@ def uploadDrop():
     # Verifica se o arquivo possui um nome
     if file.filename == '':
         return index()
+''' ------------------------------------------------------------------------------------------ '''
+# Filtros 
+
+@app.route('/filtros', methods=['GET', 'POST'])
+def filtros():
+    session['ultima_tela'] = 'filtros'
+    filtros = buscar_filtros()
+    grupos = buscar_grupos()
+    return render_template('filtros.html', filtros=filtros, grupos=grupos)
+@app.route('/adicionar_palavra', methods=['GET', 'POST'])
+def adicionar_palavra():
+    palavra_chave = request.form['palavra_chave']
+    print('Palavra adicionada',palavra_chave)
+    resposta = adicionar_palavra_chave(palavra_chave)
+    session['notificacao'] = resposta
+    return render_template('filtros.html')
+
+@app.route('/adicionar_grupo', methods=['GET', 'POST'])
+def adicionar_grupo():
+    return render_template('filtros.html', novo_grupo=True)
+
+@app.route('/preencher_grupo', methods=['GET', 'POST'])
+def preencher_grupo():
+    acao = request.form['acao']
+    dados_grupo = [request.form['nome'], request.form['descricao']]
+    print('dados_grupo',dados_grupo)
+    if acao=='cancelar':
+        return filtros()
+    todosfiltros = buscar_filtros()
+    return render_template('filtros.html', preencher_grupo=True,filtros=todosfiltros, dados_grupo=dados_grupo)
+
+@app.route('/salvar_grupo', methods=['POST'])
+def salvar_grupo():
+    dados_grupo = request.form['dados_grupo']
+    dados_grupo = dados_grupo.replace('[','')
+    dados_grupo = dados_grupo.replace(']','')
+    dados_grupo = dados_grupo.replace("'",'')
+    print('dados_grupo 2 ',dados_grupo)
+    dados = dados_grupo.split(',')
+    nome = dados[0]
+    descricao = dados[1]
+    # Cancelar
+    acao = request.form['acao']
+    if acao=='cancelar':
+        return filtros()
+    
+    lista_checkbox_id = []
+    lista_id = []
+    # Buscando todos as palavras chaves cadastradas
+    todosfiltros = buscar_filtros()
+    # Cria uma lista concatenando o nome '02-11'+ ID de todos os filtros
+    for id in todosfiltros:
+        lista_checkbox_id.append('02-11-%s'%id[0])
+    # Verifica se existe checkbox marcado com os IDs dos filtros
+    for checkbox_name in lista_checkbox_id:
+        try:
+            id_check = request.form[checkbox_name]
+            lista_id.append(id_check)
+        except:
+            pass
+    salvar_preenchimento_grupo(nome, descricao, lista_id)
+    return render_template('filtros.html')
+
+def salvar_preenchimento_grupo(nome, descricao, lista_palavras):
+    # Chama a função para salvar o grupo e ela retorna o id do grupo salvo
+    grupo_id = salvar_novo_grupo(nome, descricao)
+    if grupo_id=='erro':
+        session['notificacao'] = 'Erro ao registrar grupo'
+        return render_template('filtros.html')
+    # Chama a função para preencher a entidade que relaciona o grupo às palavras-chave
+    resposta = salvar_grupo_personalizado(lista_palavras, grupo_id)
+    session['notificacao'] = resposta
+    return render_template('filtros.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

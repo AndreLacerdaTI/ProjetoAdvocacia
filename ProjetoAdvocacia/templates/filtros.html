@@ -20,14 +20,74 @@
     </form>
 {% endblock %}
 {% block container %}
-<br>
-<h1>Palavras chave</h1>
-<button class="botao-filtros">Adicionar</button><br><br>
-{% if filtros %}
-    {% for filtro in filtros %}
-        <button class="botao-filtros">{{filtro[1]}}</button>
-    {% endfor %}
+{% if novo_grupo %}
+    <div class="fundo-branco">
+        <h1>Criar novo grupo</h1>
+        <form class="form-adicionar" method="post" action="{{ url_for('preencher_grupo') }}">
+            <label for="nome">Nome</label><br>
+            <input type="text" name="nome" placeholder="Digite o nome do grupo"><br>
+            <label for="descricao">Descrição</label><br>
+            <textarea name="descricao" placeholder="Digite uma breve descrição do grupo" rows="5" cols="30"></textarea><br>
+            <button class="botao-color" name="acao" value="salvar">Próximo passo</button><br>
+            <button class="botao-filtros" name="acao" value="cancelar">Cancelar</button>
+        </form>
+    </div>
 {% endif %}
+{% if preencher_grupo %}
+    <div class="fundo-branco">
+        <h1>Adicionar palavras-chave ao grupo</h1>
+        <form class="form-adicionar" method="post" action="{{ url_for('salvar_grupo') }}">
+            <input type="text" class="esconder" name="dados_grupo" value="{{dados_grupo}}">
+            {% if filtros %}
+                {% for filtro in filtros %}
+                    <div class="checkbox-wrapper-11">
+                        <input id="02-11-{{filtro[0]}}" type="checkbox" name="02-11-{{filtro[0]}}" value="{{filtro[0]}}">
+                        <label for="02-11-{{filtro[0]}}">{{filtro[1]}}</label>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <br>
+            <button class="botao-color" name="acao" value="salvar">Salvar</button><br>
+            <button class="botao-filtros" name="acao" value="cancelar">Cancelar</button>
+        </form>
+    </div>
+{% endif %}
+<h1>Palavras-chave</h1>
+<h3>Selecione uma opção de palavras-chave para realizar a busca no documento</h3>
+<div class="container">
+    <div class="left">
+        <h2>Adicionar</h2>
+        <h4>Adicione quantas palavras quiser, lembre-se de usar a mesma descrição que estará no documento.</h4>
+        <form method="post" action="{{ url_for('adicionar_palavra') }}">
+            <input type="text" name="palavra_chave" placeholder="Digite a palavra-chave"><br>
+            <button class="botao-color">Salvar</button>
+        </form>
+    </div>
+    <div class="right">
+        <h2>Grupos personalizados</h2>
+        <h4>Crie grupos de palavras personalizados para diferentes documentos</h4>
+        <form method="post" action="{{ url_for('adicionar_grupo') }}">
+            <button class="botao-color">Criar novo grupo</button><br>
+        </form>
+        <h3>Grupos salvos</h3>
+        {% if grupos %}
+        {% for grupo in grupos %}
+            <form method="post" action="{{ url_for('adicionar_grupo') }}">
+                <button class="botao-filtros" value="{{grupo[0]}}" title="{{grupo[1]}}">{{grupo[1]}}</button>
+            </form>
+        {% endfor %}
+    {% endif %}
+    </div>
+</div>
+<div class="down">
+    <h2>Todas</h2>
+    <h4>Aqui estão todas as palavras-chave que foram registradas no sistema</h4>
+    {% if filtros %}
+        {% for filtro in filtros %}
+            <button class="botao-filtros">{{filtro[1]}}</button>
+        {% endfor %}
+    {% endif %}
+</div>
  <!--
 <table>
     <thead>

@@ -46,14 +46,16 @@
     {% if arquivo_selecionado %}
         <img class="imagem-tipo" src="{{ url_for('static', filename='images/icone-pdf.png') }}">
         <h1 class="nome-arquivo">{{arquivo_selecionado}}</h1>
-        <form class="form-voltar" method="post" action="{{ url_for('encontrar_valores') }}">
+        <!--<form class="form-voltar" method="post" action="{{ url_for('encontrar_valores') }}">
             <input type="text" name="palavra_chave" placeholder="Digite a palavra-chave">
 
             <input class="esconder" type="text" id="arquivo_selecionado" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
             <button onclick="mostrarLoading()">
                 <img class="icone-botao-slot" src="{{ url_for('static', filename='images/icone-pesquisa.png') }}">
             </button>
-        </form>
+        </form>-->
+        <button class="botao-color">Usar todas as palavras-chave</button><br>
+        
         <br>
     {% else %}
         <!-- Arquivos -->
