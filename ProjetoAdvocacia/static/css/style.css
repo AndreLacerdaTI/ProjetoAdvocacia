@@ -9,6 +9,16 @@ body {
     font-family: 'Nunito Sans', sans-serif;
 }
 
+button {
+  width: 50px;
+  height: 50px;
+  color: #fff;
+  border: 2px solid #3034BE;
+  border-radius: 40px;
+  background-color: transparent;
+}
+
+
 .esconder{display: none;}
 
 .loading{
@@ -164,6 +174,14 @@ img {
     height: auto;
 }
 
+.botao-salvar-slot{
+  background-color: #3034BE;
+
+}
+.botao-salvar-slot:hover {
+  background-color: #393fe0;
+}
+
 input, textarea {
     width: 250px;
     height: 40px;
@@ -179,7 +197,7 @@ input, textarea {
     font-family: 'Nunito Sans', sans-serif;
 }
 input::placeholder, textarea::placeholder {
-    color: #3034BE45;
+    color: #3035be88;
 }
 
 .container{
@@ -240,19 +258,6 @@ input::placeholder, textarea::placeholder {
     height: auto;
 }
 
-input[type="file"] {
-    display: none;
-}
-
-button {
-    width: 50px;
-    height: 50px;
-    color: #fff;
-    border: 2px solid #3034BE;
-    border-radius: 40px;
-    background-color: transparent;
-}
-
 /* Esconder input do tipo file */
 input[type="file"] {
     display: none;
@@ -284,6 +289,10 @@ input[type="file"] {
 }
 
 /* Filtros */
+
+.form-botoes-filtros button, .form-botoes-filtros botao-filtros{
+  width: 500px;
+}
 
 .botao-filtros {
     width: 180px;

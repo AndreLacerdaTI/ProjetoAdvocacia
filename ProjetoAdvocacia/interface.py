@@ -57,33 +57,33 @@ def escolher_arquivo():
         apagar_arquivo(arquivo_selecionado)
         session['notificacao'] = 'Documento %s foi convertido para PDF !'% arquivo_selecionado
         return index()
-    return render_template('index.html',arquivo_selecionado=arquivo_selecionado, tipo=tipo,palavras_chave=['teste','teste'])
+    grupos = buscar_grupos()
+    return render_template('index.html',arquivo_selecionado=arquivo_selecionado, tipo=tipo,grupos=grupos)
 
 @app.route('/encontrar_valores', methods=['GET', 'POST'])
 def encontrar_valores():
-    palavra_chave = request.form['palavra_chave']
+    comando = request.form['comando']
+    if comando=='todos':
+        palavras_chave = buscar_filtros()
     arquivo_selecionado = request.form['arquivo_selecionado']
-    tipo = arquivo_selecionado.split('.')
-    tipo = tipo[1]
-    if tipo=='pdf':
         # Buscar no pdf
         #total_real = execucao(palavra_chave,arquivo_selecionado)
         #palavras_chave = extrair_palavras_chave('static/arquivos/'+arquivo_selecionado)
-        palavras_chave = ['Material de Consumo','Auxílio Transporte','Auxílio Alimentação','Internet']
-        dados = dados_pdf(arquivo_selecionado,palavras_chave)
-        for dado in dados:
-            print(dado['palavra_chave'])
-            print(dado['total'])
-            #print('Somente a primeira posicao: ',dado['informacoes'][0][0])
-            print('\n')
-            # Formato das informações do dicionario
-            '''
-            dicionario = {  'palavra_chave':'exemplo',
-                            'total':'total',
-                            'informacoes': 'dicionario={'pagina':pagina,'valor':valor}'
-                            }'''  
-        return render_template('index.html', arquivo_selecionado=arquivo_selecionado, dados_encontrados=dados)     
-
+        #palavras_chave = ['Material de Consumo','Auxílio Transporte','Auxílio Alimentação','Internet']
+    dados = dados_pdf(arquivo_selecionado,palavras_chave)
+    for dado in dados:
+        print(dado['palavra_chave'])
+        print(dado['total'])
+        #print('Somente a primeira posicao: ',dado['informacoes'][0][0])
+        print('\n')
+        # Formato das informações do dicionario
+        '''
+        dicionario = {  'palavra_chave':'exemplo',
+                        'total':'total',
+                        'informacoes': 'dicionario={'pagina':pagina,'valor':valor}'
+                        }'''  
+    return render_template('index.html', arquivo_selecionado=arquivo_selecionado, dados_encontrados=dados)     
+    '''
     elif tipo=='docx':
         palavra_chave = [palavra_chave]
         dados = dados_word(arquivo_selecionado, palavra_chave)
@@ -92,7 +92,7 @@ def encontrar_valores():
         total = somar_valores(valores)
         total_real = formatar_valor_real(total)
     return render_template('index.html', total=total_real, palavra_chave=palavra_chave, arquivo_selecionado=arquivo_selecionado, dados_encontrados=0)
-
+    '''
 UPLOAD_FOLDER_SLOT = 'static/arquivos'
 app.config['UPLOAD_FOLDER_SLOT'] = UPLOAD_FOLDER_SLOT
 #app.config['ALLOWED_EXTENSIONS'] = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}

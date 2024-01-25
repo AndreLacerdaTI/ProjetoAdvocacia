@@ -2,5 +2,7 @@ pip install
 tabula-py
 JPype1
 python-docx
+pywin32
+docx2pdf
 
 Instalar java

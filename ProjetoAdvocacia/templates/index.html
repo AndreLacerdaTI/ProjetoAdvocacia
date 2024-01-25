@@ -44,19 +44,30 @@
     {% endif %}
     <br>
     {% if arquivo_selecionado %}
-        <img class="imagem-tipo" src="{{ url_for('static', filename='images/icone-pdf.png') }}">
-        <h1 class="nome-arquivo">{{arquivo_selecionado}}</h1>
-        <!--<form class="form-voltar" method="post" action="{{ url_for('encontrar_valores') }}">
-            <input type="text" name="palavra_chave" placeholder="Digite a palavra-chave">
+        <form class="form-botoes-filtros" method="post" action="{{ url_for('encontrar_valores') }}">
+            <img class="imagem-tipo" src="{{ url_for('static', filename='images/icone-pdf.png') }}">
+            <h1 class="nome-arquivo">{{arquivo_selecionado}}</h1>
+            <!--<form class="form-voltar" method="post" action="{{ url_for('encontrar_valores') }}">
+                <input type="text" name="palavra_chave" placeholder="Digite a palavra-chave">
 
+                <input class="esconder" type="text" id="arquivo_selecionado" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
+                <button onclick="mostrarLoading()">
+                    <img class="icone-botao-slot" src="{{ url_for('static', filename='images/icone-pesquisa.png') }}">
+                </button>
+            </form>-->
+            <h1>Grupos de palavras-chave</h1>
             <input class="esconder" type="text" id="arquivo_selecionado" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
-            <button onclick="mostrarLoading()">
-                <img class="icone-botao-slot" src="{{ url_for('static', filename='images/icone-pesquisa.png') }}">
-            </button>
-        </form>-->
-        <button class="botao-color">Usar todas as palavras-chave</button><br>
-        
-        <br>
+            <h2>Selecione uma opção de palavras-chave para realizar a busca no documento</h2>
+            <button class="botao-color" onclick="mostrarLoading()" name="comando" value="todos">Usar todas as palavras-chave</button><br>
+            <h2>Grupos de palavras-chave</h2>
+            {% if grupos %}
+                {% for grupo in grupos %}
+                    <button class="botao-filtros" onclick="mostrarLoading()" name="comando" value="{{grupo[0]}}">{{grupo[1]}}</button><br>
+                {% endfor %}
+            {% endif %}
+            
+            <br>
+        </form>
     {% else %}
         <!-- Arquivos -->
         <div class="container">
@@ -82,7 +93,7 @@
                     <input type="file" name="file" id="arquivo" style="display:none" onchange="atualizarBotaoTexto(this)">
                 </div>
                 <button type="submit" class="botao-salvar-slot" name="botaoSalvar" value="{{file}}" title="Salvar arquivo carregado">
-                    <img class="icone-botao-slot" src="{{ url_for('static', filename='images/icone-salvar.png') }}">
+                    <img class="icone-botao-slot" src="{{ url_for('static', filename='images/icone-salvar-branco.png') }}">
                 </button>
             </form>
         </div>
