@@ -1,21 +1,16 @@
 {% extends "base.html" %}
 <!-- Head -->
 {% block title %}
-    <title>Definir busca</title>
+    <title>Editar Palavras-chave e Grupos</title>
 {% endblock %}
 <!-- Body -->
 {% block menu %}
     <form method="post" action="{{ url_for('navegar') }}">
         <button class="botoes-menu" name="menu" value="home">
-            Adicionar arquivo
+            Adicionar ou selecionar arquivo
         </button>
-        >
-        <button class="botoes-menu" name="menu" value="home">
-            Selecionar arquivo
-        </button>
-        >
         <button class="botoes-menu" name="menu" value="filtros">
-            Definir busca
+            Editar Palavras-chave e Grupos
         </button>
     </form>
 {% endblock %}
@@ -29,6 +24,21 @@
             <label for="descricao">Descrição</label><br>
             <textarea name="descricao" placeholder="Digite uma breve descrição do grupo" rows="5" cols="30"></textarea><br>
             <button class="botao-color" name="acao" value="salvar">Próximo passo</button><br>
+            <button class="botao-filtros" name="acao" value="cancelar">Cancelar</button>
+        </form>
+    </div>
+{% endif %}
+{% if editar_grupo %}
+    <div class="fundo-branco">
+        <h1>Editar grupo</h1>
+        <h2>{{grupo[1]}}</h2>
+        <form class="form-adicionar" method="post" action="{{ url_for('preencher_grupo') }}">
+            <input type="text" class="esconder" name="grupo_id" value="{{grupo[0]}}">
+            <label for="nome">Nome</label><br>
+            <input type="text" name="nome" value="{{grupo[1]}}" placeholder="Digite o nome do grupo"><br>
+            <label for="descricao">Descrição</label><br>
+            <textarea name="descricao" placeholder="Digite uma breve descrição do grupo" rows="5" cols="30">{{grupo[2]}}</textarea><br>
+            <button class="botao-color" name="acao" value="alterar">Próximo passo</button><br>
             <button class="botao-filtros" name="acao" value="cancelar">Cancelar</button>
         </form>
     </div>
@@ -47,13 +57,16 @@
                 {% endfor %}
             {% endif %}
             <br>
-            <button class="botao-color" name="acao" value="salvar">Salvar</button><br>
+
+            <button class="botao-color" name="acao" value="{% if alterar %}alterar{% else %}salvar{% endif %}">Salvar</button><br>
             <button class="botao-filtros" name="acao" value="cancelar">Cancelar</button>
         </form>
     </div>
 {% endif %}
+
 <h1>Palavras-chave</h1>
-<h3>Selecione uma opção de palavras-chave para realizar a busca no documento</h3>
+<h3>Adicione ou edite palvras-chave</h3>
+<h3>Crie e edite grupos personalizados para realizar buscas</h3>
 <div class="container">
     <div class="left">
         <h2>Adicionar</h2>
@@ -72,8 +85,8 @@
         <h3>Grupos salvos</h3>
         {% if grupos %}
         {% for grupo in grupos %}
-            <form method="post" action="{{ url_for('adicionar_grupo') }}">
-                <button class="botao-filtros" value="{{grupo[0]}}" title="{{grupo[1]}}">{{grupo[1]}}</button>
+            <form method="post" action="{{ url_for('editar_grupo') }}">
+                <button class="botao-filtros" name="grupo_id" value="{{grupo[0]}}" title="{{grupo[1]}}">{{grupo[1]}}</button>
             </form>
         {% endfor %}
     {% endif %}
@@ -84,7 +97,7 @@
     <h4>Aqui estão todas as palavras-chave que foram registradas no sistema</h4>
     {% if filtros %}
         {% for filtro in filtros %}
-            <button class="botao-filtros">{{filtro[1]}}</button>
+            <button class="botao-filtros" title="{{filtro[1]}}">{{filtro[1]}}</button>
         {% endfor %}
     {% endif %}
 </div>

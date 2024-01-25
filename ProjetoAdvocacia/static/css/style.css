@@ -70,7 +70,7 @@ button {
     height: 100%;
     background-color: #ffffff;
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     align-items: center;
     text-align: center;
 }
@@ -81,12 +81,16 @@ button {
 }
 .form-adicionar input {
     margin: 10px;
+    width: 500px;
 }
 .form-adicionar textarea {
-    width: 400px;
+    width: 600px;
     height: 100px;
     text-align: center;
-    line-height: 100px;
+    line-height: 25px;
+    padding-inline: 25px;
+    padding-top: 25px;
+    padding-bottom: 25px;
 }
 
 .logo{
@@ -257,6 +261,11 @@ input::placeholder, textarea::placeholder {
     width: 80px;
     height: auto;
 }
+.botao-sem-borda{
+    width: 90px;
+    height: auto;
+    border: 0;
+}
 
 /* Esconder input do tipo file */
 input[type="file"] {
@@ -361,21 +370,44 @@ input[type="file"] {
 }
 
 table {
-    width: 80%;
+    width: 95%;
+    margin: 2.5%;
 }
 table tr th{
     background-color: #3034BE;
     color: #fff;
-    width: 50%;
+    width: 45%;
+    height: 40px;
 }
 table tr td {
     align-items: center;
     text-align: center;
-    width: 50%;
+    width: 45%;
     border: 1px solid #dddddd;
 }
 table tr:hover {
-    background-color: #d7d7d7;
+    background-color: #3034BE20;
+}
+table tr td form{
+    width: 100%;
+}
+.botao-tabela {
+    color: #3034BE;
+    align-items: center;
+    width: 35%;
+    border: 0;
+    transition: 0.2s;
+}
+.botao-tabela:hover {
+    width: 40%;
+    border: 0;
+}
+.botao-tabela img {
+    width: 100%;
+}
+
+.linha-valores{
+    height: 40px;
 }
 
 

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, redirect, url_for, send_file
 
 import os
 
@@ -64,12 +64,28 @@ def escolher_arquivo():
 def encontrar_valores():
     comando = request.form['comando']
     if comando=='todos':
-        palavras_chave = buscar_filtros()
+        palavras_chave = buscar_nomes_filtros()
+    else:
+        palavras_chave_id = []
+        # Busca todos os grupos personalizados
+        grupo_personalizado = consultar_grupo_personalizado()
+        # Recebe o ID herdado da tela anterior
+        grupo_id = comando
+        # Guarda os ID das palavras-chave em uma lista
+        for grupo in grupo_personalizado:
+            #print('palavra_id:',grupo[0])
+            #print('grupo_id:',grupo[1])
+            if int(grupo_id)==grupo[1]:
+                palavras_chave_id.append(grupo[0])
+        # Busca as palavras pelo ID
+        dados = buscar_palavras_grupo_personalizado(palavras_chave_id)
+        palavras_chave = []
+        # Formata a lista das palavras-chave para a consulta. Ex: palavras-chave = ['nome','nome2']
+        for dado in dados:
+            palavras_chave.append(dado[1])
+    # Receber o nome do arquivo selecionado
     arquivo_selecionado = request.form['arquivo_selecionado']
-        # Buscar no pdf
-        #total_real = execucao(palavra_chave,arquivo_selecionado)
-        #palavras_chave = extrair_palavras_chave('static/arquivos/'+arquivo_selecionado)
-        #palavras_chave = ['Material de Consumo','Auxílio Transporte','Auxílio Alimentação','Internet']
+    # Buscar no pdf
     dados = dados_pdf(arquivo_selecionado,palavras_chave)
     for dado in dados:
         print(dado['palavra_chave'])
@@ -81,18 +97,21 @@ def encontrar_valores():
         dicionario = {  'palavra_chave':'exemplo',
                         'total':'total',
                         'informacoes': 'dicionario={'pagina':pagina,'valor':valor}'
-                        }'''  
-    return render_template('index.html', arquivo_selecionado=arquivo_selecionado, dados_encontrados=dados)     
-    '''
-    elif tipo=='docx':
-        palavra_chave = [palavra_chave]
-        dados = dados_word(arquivo_selecionado, palavra_chave)
-        print(dados)
-        valores = converter_valores_reais(dados[1])
-        total = somar_valores(valores)
-        total_real = formatar_valor_real(total)
-    return render_template('index.html', total=total_real, palavra_chave=palavra_chave, arquivo_selecionado=arquivo_selecionado, dados_encontrados=0)
-    '''
+                        }'''
+    return render_template('index.html', arquivo_selecionado=arquivo_selecionado, dados_encontrados=dados)
+@app.route('/detalhar_valores', methods=['GET', 'POST'])
+def detalhar_valores():
+    palavras_chave = request.form['palavras_chave']
+    arquivo_selecionado = request.form['arquivo_selecionado']
+    dados = dados_pdf(arquivo_selecionado,palavras_chave)
+    detalhes = dados[1][0]
+    informacoes = {
+        'quantidade':len(detalhes),
+        'total':dados[0],
+        'palavra-chave':palavras_chave
+    }
+    return render_template('index.html', arquivo_selecionado=arquivo_selecionado, detalhes_valores=True, informacoes=informacoes, detalhes=detalhes)
+
 UPLOAD_FOLDER_SLOT = 'static/arquivos'
 app.config['UPLOAD_FOLDER_SLOT'] = UPLOAD_FOLDER_SLOT
 #app.config['ALLOWED_EXTENSIONS'] = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
@@ -117,6 +136,21 @@ def uploadDrop():
     # Verifica se o arquivo possui um nome
     if file.filename == '':
         return index()
+
+@app.route('/visualizar_pdf', methods=['GET', 'POST'])
+def visualizar_pdf():
+    arquivo_selecionado = request.form['arquivo_selecionado']
+    # Caminho para o arquivo PDF no diretório
+    caminho_arquivo = 'static/arquivos/'+arquivo_selecionado  # Substitua pelo caminho real do seu arquivo
+
+    # Verificar se o arquivo existe
+    if os.path.exists(caminho_arquivo):
+        # Enviar o arquivo como resposta
+        return send_file(caminho_arquivo, as_attachment=True)
+        #return f'<a href="/static/{caminho_arquivo}" target="_blank">Visualizar PDF</a>'
+    else:
+        return 'Arquivo não encontrado'
+
 ''' ------------------------------------------------------------------------------------------ '''
 # Filtros 
 
@@ -138,6 +172,13 @@ def adicionar_palavra():
 def adicionar_grupo():
     return render_template('filtros.html', novo_grupo=True)
 
+@app.route('/editar_grupo', methods=['GET', 'POST'])
+def editar_grupo():
+    grupo_id = request.form['grupo_id']
+    grupo = buscar_grupo(grupo_id)
+    print(grupo)
+    return render_template('filtros.html', editar_grupo=True, grupo=grupo)
+
 @app.route('/preencher_grupo', methods=['GET', 'POST'])
 def preencher_grupo():
     acao = request.form['acao']
@@ -146,15 +187,22 @@ def preencher_grupo():
     if acao=='cancelar':
         return filtros()
     todosfiltros = buscar_filtros()
-    return render_template('filtros.html', preencher_grupo=True,filtros=todosfiltros, dados_grupo=dados_grupo)
+    if acao=='alterar':
+        grupo_id = request.form['grupo_id']
+        dados_grupo.append(grupo_id)
+        print(dados_grupo)
+        return render_template('filtros.html', preencher_grupo=True, alterar=True,filtros=todosfiltros, dados_grupo=dados_grupo)
+    else:
+        return render_template('filtros.html', preencher_grupo=True,filtros=todosfiltros, dados_grupo=dados_grupo)
 
 @app.route('/salvar_grupo', methods=['POST'])
 def salvar_grupo():
+    # Recebe os dados nome, descricao e se for uma alteração o id do grupo ['nome','descricao','grupo_id']
     dados_grupo = request.form['dados_grupo']
     dados_grupo = dados_grupo.replace('[','')
     dados_grupo = dados_grupo.replace(']','')
     dados_grupo = dados_grupo.replace("'",'')
-    print('dados_grupo 2 ',dados_grupo)
+    #print('dados_grupo 2 ',dados_grupo)
     dados = dados_grupo.split(',')
     nome = dados[0]
     descricao = dados[1]
@@ -177,7 +225,28 @@ def salvar_grupo():
             lista_id.append(id_check)
         except:
             pass
-    salvar_preenchimento_grupo(nome, descricao, lista_id)
+    if acao=='salvar':
+        salvar_preenchimento_grupo(nome, descricao, lista_id)
+    if acao=='alterar':
+        grupo_id = dados[2]
+        resposta = salvar_alteracao_grupo(grupo_id, nome, descricao)
+        # Armazena as palavras que serão adicionadas ao grupo
+        novas_palavras_chave = lista_id
+        # Separando as palavras que serão excluidas do grupo
+        antigas_palavras_chave = []
+        grupo_personalizado = consultar_grupo_personalizado()
+        for grupo in grupo_personalizado:
+            if grupo[1]==int(grupo_id):
+                antigas_palavras_chave.append(grupo[0])
+        print(antigas_palavras_chave)
+        # Apagar entidade fraca antiga
+        for palavra_chave_id in antigas_palavras_chave:
+            print('apagar palavra_chave_id',palavra_chave_id)
+            apagar_grupo_personalizado(palavra_chave_id, grupo_id)
+        # salvar na entidade fraca as alterações
+        if resposta!='erro':
+            alterar_grupo_personalizado(lista_id, grupo_id)
+
     return render_template('filtros.html')
 
 def salvar_preenchimento_grupo(nome, descricao, lista_palavras):
@@ -193,3 +262,4 @@ def salvar_preenchimento_grupo(nome, descricao, lista_palavras):
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
+    #app.run('192.168.20.125', port=5001)

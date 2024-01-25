@@ -41,6 +41,7 @@ def buscar_descricao_e_valor(pdf_path, descricao):
             indice = 0
             for linha in linhas:
                 if descricao in linha:
+                    #print(descricao)
                     #print(linha+' pagina: '+str(pagina_numero+1))
                     #print(linhas[indice+2])
                     dados_encontrados = {'pagina':pagina_numero+1,'valor':linhas[indice+2]}
@@ -52,10 +53,11 @@ def buscar_descricao_e_valor(pdf_path, descricao):
     dados.append(dicionario)
     return dados
 
-def dados_pdf(arquivo_selecionado,palavra_chave):
-    if len(palavra_chave)>1:
+def dados_pdf(arquivo_selecionado, palavra_chave):
+    if type(palavra_chave)==list:
         multiplos_dados = []
         for palavra in palavra_chave:
+            print('teste',palavra_chave[0])
             dados = buscar_descricao_e_valor('static/arquivos/'+arquivo_selecionado,palavra)
             valores = []
             # Retira o a palavra chave da lista

@@ -25,78 +25,122 @@
         <h1>Processando...</h1>
         <h2>Não vai demorar muito</h2>
     </div>
-    {% if dados_encontrados %}
+    {% if detalhes_valores %} <!-- Tabela dos valores detalhados da palavra-chave encontrada -->
+        <br>
+        <form method="post" action="{{ url_for('visualizar_pdf') }}">
+            <input type="text" class="esconder" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
+            <button class="botao-sem-borda" title="Clique para fazer o download do arquivo"><img class="imagem-tipo" src="{{ url_for('static', filename='images/icone-pdf.png') }}"></button>
+        </form>
+        <h1 class="nome-arquivo">{{arquivo_selecionado}}</h1>
+        <h1>Total: {{informacoes['total']}}</h1>
+        <h3>A palavra-chave "{{informacoes['palavra-chave']}}" foi encontrada {{informacoes['quantidade']}} vezes</h3>
         <table>
             <thead>
                 <tr>
-                    <th>Descrição</td>
-                    <th>Total</td>
+                    <th title="Página do PDF onde o valor foi encontrado">Página</td>
+                    <th>Valor</td>
                 </tr>
             </thead>
             <tbody>
-                {% for dados in dados_encontrados %}
-                    <td>{{dados['palavra_chave']}}</td>
-                    <td>{{dados['total']}}</td>
+                {% for dados in detalhes %}
+                    <td class="linha-valores" title="Página {{dados['pagina']}}">{{dados['pagina']}}</td>
+                    <td>{{dados['valor']}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-    {% endif %}
-    <br>
-    {% if arquivo_selecionado %}
-        <form class="form-botoes-filtros" method="post" action="{{ url_for('encontrar_valores') }}">
-            <img class="imagem-tipo" src="{{ url_for('static', filename='images/icone-pdf.png') }}">
-            <h1 class="nome-arquivo">{{arquivo_selecionado}}</h1>
-            <!--<form class="form-voltar" method="post" action="{{ url_for('encontrar_valores') }}">
-                <input type="text" name="palavra_chave" placeholder="Digite a palavra-chave">
-
-                <input class="esconder" type="text" id="arquivo_selecionado" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
-                <button onclick="mostrarLoading()">
-                    <img class="icone-botao-slot" src="{{ url_for('static', filename='images/icone-pesquisa.png') }}">
-                </button>
-            </form>-->
-            <h1>Grupos de palavras-chave</h1>
-            <input class="esconder" type="text" id="arquivo_selecionado" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
-            <h2>Selecione uma opção de palavras-chave para realizar a busca no documento</h2>
-            <button class="botao-color" onclick="mostrarLoading()" name="comando" value="todos">Usar todas as palavras-chave</button><br>
-            <h2>Grupos de palavras-chave</h2>
-            {% if grupos %}
-                {% for grupo in grupos %}
-                    <button class="botao-filtros" onclick="mostrarLoading()" name="comando" value="{{grupo[0]}}">{{grupo[1]}}</button><br>
-                {% endfor %}
-            {% endif %}
-            
-            <br>
-        </form>
     {% else %}
-        <!-- Arquivos -->
-        <div class="container">
-            <form class="form-botoes-arquivos" method="post" action="{{ url_for('escolher_arquivo') }}">
-                <h1>Arquivos salvos</h1>
-                {% for arquivo in arquivos_armazenados %}
-                    <button class="botoes-arquivos" name="arquivo_selecionado" value="{{arquivo}}">{{arquivo}}</button>
-                    <button class="botao-excluir-arquivos" name="arquivo_selecionado" value="excluir-{{arquivo}}">
-                        <img src="{{ url_for('static', filename='images/icone-excluir.png') }}">
-                    </button>
-                {% endfor %}
-            </form>
+        {% if dados_encontrados %}
             <br>
-            <form class="form-dropzone" method="post" enctype="multipart/form-data" action="{{ url_for('uploadDrop') }}">
-                <h1>Adicionar novo</h1>
-                <div class="dropzone" title="Arraste e solte o arquivo aqui ou clique no botão para procurar" id="dropzone" ondragenter="handleDragEnter(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-                    <h3>Arraste e solte o arquivo aqui</h3>
-                    <h3>ou</h3>
-                    <label for="arquivo" class="label-upload">
-                        <img id="icone-botao-upload" src="{{ url_for('static', filename='images/icone-upload.png') }}"><br>
-                        <a id="botao-upload">Encontrar arquivo</a>
-                    </label>
-                    <input type="file" name="file" id="arquivo" style="display:none" onchange="atualizarBotaoTexto(this)">
-                </div>
-                <button type="submit" class="botao-salvar-slot" name="botaoSalvar" value="{{file}}" title="Salvar arquivo carregado">
-                    <img class="icone-botao-slot" src="{{ url_for('static', filename='images/icone-salvar-branco.png') }}">
-                </button>
+            <form method="post" action="{{ url_for('visualizar_pdf') }}">
+                <input type="text" class="esconder" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
+                <button class="botao-sem-borda" title="Clique para fazer o download do arquivo"><img class="imagem-tipo" src="{{ url_for('static', filename='images/icone-pdf.png') }}"></button>
             </form>
-        </div>
+            <h1 class="nome-arquivo">{{arquivo_selecionado}}</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Descrição</td>
+                        <th>Total</td>
+                        <th>Detalhes</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dados in dados_encontrados %}
+                        <td>{{dados['palavra_chave']}}</td>
+                        <td>{{dados['total']}}</td>
+                        <td>
+                            <form method="post" action="{{ url_for('detalhar_valores') }}">
+                                <button onclick="mostrarLoading()" class="botao-tabela" name="palavras_chave" value="{{dados['palavra_chave']}}" title="Ver detalhes">
+                                    <img class="" src="{{ url_for('static', filename='images/icone-detalhes.png') }}">
+                                </button>
+                                <input type="text" class="esconder" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %} <!-- Se não estiver exibindo a tabela de valores, mostrar opções de filtros -->
+            <br>
+            {% if arquivo_selecionado %} 
+                <form method="post" action="{{ url_for('visualizar_pdf') }}">
+                    <input type="text" class="esconder" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
+                    <button class="botao-sem-borda" title="Clique para fazer o download do arquivo"><img class="imagem-tipo" src="{{ url_for('static', filename='images/icone-pdf.png') }}"></button>
+                </form>
+                <h1 class="nome-arquivo">{{arquivo_selecionado}}</h1>
+                <form class="form-botoes-filtros" method="post" action="{{ url_for('encontrar_valores') }}">
+                    <!--<form class="form-voltar" method="post" action="{{ url_for('encontrar_valores') }}">
+                        <input type="text" name="palavra_chave" placeholder="Digite a palavra-chave">
+
+                        <input class="esconder" type="text" id="arquivo_selecionado" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
+                        <button onclick="mostrarLoading()">
+                            <img class="icone-botao-slot" src="{{ url_for('static', filename='images/icone-pesquisa.png') }}">
+                        </button>
+                    </form>-->
+                    <input class="esconder" type="text" id="arquivo_selecionado" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
+                    <h1>Selecione uma opção de palavras-chave para realizar a busca no documento</h1>
+                    <button class="botao-color" onclick="mostrarLoading()" name="comando" value="todos">Usar todas as palavras-chave</button><br>
+                    <h2>Grupos de palavras-chave</h2>
+                    {% if grupos %}
+                        {% for grupo in grupos %}
+                            <button class="botao-filtros" onclick="mostrarLoading()" name="comando" value="{{grupo[0]}}">{{grupo[1]}}</button><br>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <br>
+                </form>
+            {% else %} <!-- Se nenhum arquivo estiver selecionado, mostrar tela de seleção  -->
+                <!-- Arquivos -->
+                <div class="container">
+                    <form class="form-botoes-arquivos" method="post" action="{{ url_for('escolher_arquivo') }}">
+                        <h1>Arquivos salvos</h1>
+                        {% for arquivo in arquivos_armazenados %}
+                            <button class="botoes-arquivos" name="arquivo_selecionado" value="{{arquivo}}">{{arquivo}}</button>
+                            <button class="botao-excluir-arquivos" name="arquivo_selecionado" value="excluir-{{arquivo}}">
+                                <img src="{{ url_for('static', filename='images/icone-excluir.png') }}">
+                            </button>
+                        {% endfor %}
+                    </form>
+                    <br>
+                    <form class="form-dropzone" method="post" enctype="multipart/form-data" action="{{ url_for('uploadDrop') }}">
+                        <h1>Adicionar novo</h1>
+                        <div class="dropzone" title="Arraste e solte o arquivo aqui ou clique no botão para procurar" id="dropzone" ondragenter="handleDragEnter(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                            <h3>Arraste e solte o arquivo aqui</h3>
+                            <h3>ou</h3>
+                            <label for="arquivo" class="label-upload">
+                                <img id="icone-botao-upload" src="{{ url_for('static', filename='images/icone-upload.png') }}"><br>
+                                <a id="botao-upload">Encontrar arquivo</a>
+                            </label>
+                            <input type="file" name="file" id="arquivo" style="display:none" onchange="atualizarBotaoTexto(this)">
+                        </div>
+                        <button type="submit" class="botao-salvar-slot" name="botaoSalvar" value="{{file}}" title="Salvar arquivo carregado">
+                            <img class="icone-botao-slot" src="{{ url_for('static', filename='images/icone-salvar-branco.png') }}">
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        {% endif %}
     {% endif %}
     <script>
         function handleDragOver(event) {
