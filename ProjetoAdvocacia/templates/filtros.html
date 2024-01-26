@@ -15,6 +15,19 @@
     </form>
 {% endblock %}
 {% block container %}
+{% if editar_palavra_chave %}
+    <div class="fundo-branco">
+        <h1>Editar palavra-chave</h1>
+        <h2>{{palavra_chave[1]}}</h2>
+        <form class="form-adicionar" method="post" action="{{ url_for('salvar_alteracao_palavra_chave') }}">
+            <input type="text" class="esconder" name="palavra_id" value="{{palavra_chave[0]}}">
+            <label for="palavra_chave">Palavra-chave</label><br>
+            <input type="text" name="palavra_chave" value="{{palavra_chave[1]}}" placeholder="Digite a palavra-chave"><br>
+            <button class="botao-color" name="acao" value="salvar">Salvar</button><br>
+            <button class="botao-filtros" name="acao" value="cancelar">Cancelar</button>
+        </form>
+    </div>
+{% endif %}
 {% if novo_grupo %}
     <div class="fundo-branco">
         <h1>Criar novo grupo</h1>
@@ -96,96 +109,11 @@
     <h2>Todas</h2>
     <h4>Aqui estão todas as palavras-chave que foram registradas no sistema</h4>
     {% if filtros %}
-        {% for filtro in filtros %}
-            <button class="botao-filtros" title="{{filtro[1]}}">{{filtro[1]}}</button>
-        {% endfor %}
+        <form method="post" action="{{ url_for('editar_palavra') }}">
+            {% for filtro in filtros %}
+                <button class="botao-filtros" title="{{filtro[1]}}" name="palavra_id" value="{{filtro[0]}}-{{filtro[1]}}">{{filtro[1]}}</button>
+            {% endfor %}
+        </form>
     {% endif %}
-</div>
- <!--
-<table>
-    <thead>
-        <tr>
-            <th>Palavra chave</th>
-            <th>Ativado / Desativado</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% if filtros %}
-        {% for filtro in filtros %}
-            <tr>
-                <td>{{filtro[1]}}
-                    <div class="checkbox-wrapper-2">
-                        <input type="checkbox" class="sc-gJwTLC ikxBAC">
-                    </div>
-                </td>
-            </tr>
-        {% endfor %}
-    {% endif %}
-    </tbody>
-</table>
-    <style>
-        .checkbox-wrapper-2 .ikxBAC {
-        appearance: none;
-        background-color: #535353;
-        border-radius: 72px;
-        border-style: none;
-        flex-shrink: 0;
-        height: 34px;
-        margin: 0;
-        position: relative;
-        width: 60px;
-        }
-    
-        .checkbox-wrapper-2 .ikxBAC::before {
-        bottom: -6px;
-        content: "";
-        left: -6px;
-        position: absolute;
-        right: -6px;
-        top: -6px;
-        }
-    
-        .checkbox-wrapper-2 .ikxBAC,
-        .checkbox-wrapper-2 .ikxBAC::after {
-        transition: all 100ms ease-out;
-        }
-    
-        .checkbox-wrapper-2 .ikxBAC::after {
-        background-color: #fff;
-        border-radius: 50%;
-        content: "";
-        height: 28px;
-        left: 3px;
-        position: absolute;
-        top: 3px;
-        width: 28px;
-        }
-    
-        .checkbox-wrapper-2 input[type=checkbox] {
-        cursor: default;
-        }
-    
-        .checkbox-wrapper-2 .ikxBAC:hover {
-        background-color: #898989;
-        transition-duration: 0s;
-        }
-    
-        .checkbox-wrapper-2 .ikxBAC:checked {
-        background-color: #3034BE;
-        }
-    
-        .checkbox-wrapper-2 .ikxBAC:checked::after {
-        background-color: #fff;
-        left: 28px;
-        }
-    
-        .checkbox-wrapper-2 :focus:not(.focus-visible) {
-        outline: 0;
-        }
-    
-        .checkbox-wrapper-2 .ikxBAC:checked:hover {
-        background-color: #6a6fff;
-        }
-    </style>
--->   
-  {% endblock %}
+</div>  
+{% endblock %}

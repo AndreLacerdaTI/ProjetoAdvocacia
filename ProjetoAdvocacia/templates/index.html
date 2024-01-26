@@ -7,15 +7,10 @@
 {% block menu %}
     <form method="post" action="{{ url_for('navegar') }}">
         <button class="botoes-menu" name="menu" value="home">
-            Adicionar arquivo
+            Adicionar ou selecionar arquivo
         </button>
-        >
-        <button class="botoes-menu" name="menu" value="home">
-            Selecionar arquivo
-        </button>
-        >
         <button class="botoes-menu" name="menu" value="filtros">
-            Definir busca
+            Editar Palavras-chave e Grupos
         </button>
     </form>
 {% endblock %}
@@ -116,7 +111,7 @@
                     <form class="form-botoes-arquivos" method="post" action="{{ url_for('escolher_arquivo') }}">
                         <h1>Arquivos salvos</h1>
                         {% for arquivo in arquivos_armazenados %}
-                            <button class="botoes-arquivos" name="arquivo_selecionado" value="{{arquivo}}">{{arquivo}}</button>
+                            <button class="botoes-arquivos" onclick="mostrarLoading()" name="arquivo_selecionado" value="{{arquivo}}">{{arquivo}}</button>
                             <button class="botao-excluir-arquivos" name="arquivo_selecionado" value="excluir-{{arquivo}}">
                                 <img src="{{ url_for('static', filename='images/icone-excluir.png') }}">
                             </button>

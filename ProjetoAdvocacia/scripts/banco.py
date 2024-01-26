@@ -103,6 +103,18 @@ def adicionar_palavra_chave(palavra_chave):
     except:
         return 'Erro ao salvar palavra-chave "%s"!' % palavra_chave
 
+def salvar_alteracao_palavra(palavra_id, palavra_chave):
+    conn = sqlite3.connect('filtros.db')
+    # Criar um cursor para executar comandos SQL
+    cursor = conn.cursor()
+    # Consultar todas as palavras-chave com suas derivações
+    try:
+        cursor.execute('UPDATE PalavraChave SET palavra_chave = ? WHERE id = ?', (palavra_chave, palavra_id))
+        conn.commit()
+        return 'Alteração da palavra-chave "%s" salva com sucesso!' % palavra_chave
+    except:
+        return 'erro'
+
 def buscar_filtros():
     # Conectar ao banco de dados (cria o banco se não existir)
     conn = sqlite3.connect('filtros.db')
@@ -153,10 +165,12 @@ def alterar_grupo_personalizado(lista_palavras, grupo_id):
     # Criar um cursor para executar comandos SQL
     cursor = conn.cursor()
     for id in lista_palavras:
-        #cursor.execute('INSERT INTO GrupoPersonalizado (palavra_chave_id, grupo_id) VALUES (?, ?)', (id,grupo_id))
+        print('ID:',id)
+        print('ID grupo:',grupo_id)
+        cursor.execute('INSERT INTO GrupoPersonalizado (palavra_chave_id, grupo_id) VALUES (?, ?)', (id,grupo_id))
         #cursor.execute('UPDATE Grupo SET nome = ?, descricao = ? WHERE id = ?', (nome, descricao, grupo_id))
         conn.commit()
-    return 'Grupo adicionado com sucesso!'
+    return 'Pronto! Suas alterações no grupo foram salvas com sucesso.'
     '''
     for id_palavra in palavras_chave_id:
         apagar_grupo_personalizado(id_palavra, grupo_id)
@@ -168,6 +182,7 @@ def salvar_alteracao_grupo(grupo_id, nome, descricao):
     cursor = conn.cursor()
     # Consultar todas as palavras-chave com suas derivações
     try:
+        #print('descricao',descricao)
         cursor.execute('UPDATE Grupo SET nome = ?, descricao = ? WHERE id = ?', (nome, descricao, grupo_id))
         conn.commit()
         return grupo_id

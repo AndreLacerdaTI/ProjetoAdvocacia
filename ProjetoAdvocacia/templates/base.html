@@ -19,6 +19,7 @@
     {% if session['notificacao'] %}
         <div class="notificacao">
             <h4 class="titulo-notificacao">{{session['notificacao']}}</h4>
+            <br>
             <form method="post" action="{{ url_for('fechar_notificacao') }}">
                 <button class="botao-fechar" value="{{session['notificacao']}}">OK</button>
             </form>

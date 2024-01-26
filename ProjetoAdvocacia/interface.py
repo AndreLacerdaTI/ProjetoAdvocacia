@@ -57,6 +57,10 @@ def escolher_arquivo():
         apagar_arquivo(arquivo_selecionado)
         session['notificacao'] = 'Documento %s foi convertido para PDF !'% arquivo_selecionado
         return index()
+    if tipo!='pdf':
+        apagar_arquivo(arquivo_selecionado)
+        session['notificacao'] = 'Tipo de arquivo inválido. Selecione arquivos com extensão .pdf ou .docx'
+        return render_template('index.html')
     grupos = buscar_grupos()
     return render_template('index.html',arquivo_selecionado=arquivo_selecionado, tipo=tipo,grupos=grupos)
 
@@ -113,8 +117,10 @@ def detalhar_valores():
     return render_template('index.html', arquivo_selecionado=arquivo_selecionado, detalhes_valores=True, informacoes=informacoes, detalhes=detalhes)
 
 UPLOAD_FOLDER_SLOT = 'static/arquivos'
+app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'docx', 'doc'}
 app.config['UPLOAD_FOLDER_SLOT'] = UPLOAD_FOLDER_SLOT
-#app.config['ALLOWED_EXTENSIONS'] = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
+
 
 
 @app.route('/uploadDrop', methods=['GET', 'POST'])
@@ -123,16 +129,23 @@ def uploadDrop():
     if 'file' not in request.files:
         return render_template('index.html')
     file = request.files['file']
+    nome_arquivo = file.filename[-5:]
+    tipo = nome_arquivo.split('.')
+    tipo_arquivo = tipo[1]
+    extensoes_validas = ['pdf','docx','doc']
+    if tipo_arquivo not in extensoes_validas:
+        session['notificacao'] = 'Tipo de arquivo inválido. Selecione arquivos com extensão .pdf ou .docx'
+        return index()
     if request.method == 'POST':
         if 'file' in request.files:
             arquivo = request.files['file']
             if arquivo.filename != '':
-                print("Entrou aqui",arquivo.filename)
                 # Um arquivo foi selecionado no campo de entrada 'arquivo'
                 # Salva o arquivo no diretório de upload
                 file.save(os.path.join(app.config['UPLOAD_FOLDER_SLOT'], file.filename))
                 session['arquivo_selecionado'] = arquivo.filename
-                return render_template('index.html', arquivo_selecionado=arquivo.filename)
+                grupos = buscar_grupos()
+                return render_template('index.html', arquivo_selecionado=arquivo.filename, grupos = grupos)
     # Verifica se o arquivo possui um nome
     if file.filename == '':
         return index()
@@ -165,6 +178,25 @@ def adicionar_palavra():
     palavra_chave = request.form['palavra_chave']
     print('Palavra adicionada',palavra_chave)
     resposta = adicionar_palavra_chave(palavra_chave)
+    session['notificacao'] = resposta
+    return render_template('filtros.html')
+
+@app.route('/editar_palavra', methods=['GET', 'POST'])
+def editar_palavra():
+    palavra_id = request.form['palavra_id']
+    palavra_id = palavra_id.split('-')
+    dados = [palavra_id[0],palavra_id[1]]
+
+    return render_template('filtros.html',editar_palavra_chave=True, palavra_chave=dados)
+
+@app.route('/salvar_alteracao_palavra_chave', methods=['GET', 'POST'])
+def salvar_alteracao_palavra_chave():
+    acao = request.form['acao']
+    palavra_id = request.form['palavra_id']
+    palavra_chave = request.form['palavra_chave']
+    if acao=='cancelar':
+        return filtros()
+    resposta = salvar_alteracao_palavra(palavra_id, palavra_chave)
     session['notificacao'] = resposta
     return render_template('filtros.html')
 
@@ -201,11 +233,13 @@ def salvar_grupo():
     dados_grupo = request.form['dados_grupo']
     dados_grupo = dados_grupo.replace('[','')
     dados_grupo = dados_grupo.replace(']','')
+    dados_grupo = dados_grupo.replace(" '",'')
     dados_grupo = dados_grupo.replace("'",'')
     #print('dados_grupo 2 ',dados_grupo)
     dados = dados_grupo.split(',')
     nome = dados[0]
     descricao = dados[1]
+    print('descricao,',dados)
     # Cancelar
     acao = request.form['acao']
     if acao=='cancelar':
@@ -238,15 +272,16 @@ def salvar_grupo():
         for grupo in grupo_personalizado:
             if grupo[1]==int(grupo_id):
                 antigas_palavras_chave.append(grupo[0])
-        print(antigas_palavras_chave)
+        print('antigas: ',antigas_palavras_chave)
         # Apagar entidade fraca antiga
         for palavra_chave_id in antigas_palavras_chave:
             print('apagar palavra_chave_id',palavra_chave_id)
             apagar_grupo_personalizado(palavra_chave_id, grupo_id)
         # salvar na entidade fraca as alterações
         if resposta!='erro':
-            alterar_grupo_personalizado(lista_id, grupo_id)
-
+            print('testando')
+            resposta = alterar_grupo_personalizado(novas_palavras_chave, grupo_id)
+            session['notificacao'] = resposta
     return render_template('filtros.html')
 
 def salvar_preenchimento_grupo(nome, descricao, lista_palavras):
