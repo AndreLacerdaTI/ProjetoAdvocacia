@@ -40,6 +40,7 @@
                 {% for dados in detalhes %}
                     <td class="linha-valores" title="Página {{dados['pagina']}}">{{dados['pagina']}}</td>
                     <td>{{dados['valor']}}</td>
+                    <td>{{dados['orgao']}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -62,6 +63,7 @@
                 </thead>
                 <tbody>
                     {% for dados in dados_encontrados %}
+                        <td>{{dados['orgao']}}</td>
                         <td>{{dados['palavra_chave']}}</td>
                         <td>{{dados['total']}}</td>
                         <td>

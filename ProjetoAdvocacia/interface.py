@@ -92,10 +92,10 @@ def encontrar_valores():
     # Buscar no pdf
     dados = dados_pdf(arquivo_selecionado,palavras_chave)
     for dado in dados:
-        print(dado['palavra_chave'])
-        print(dado['total'])
+        #print(dado['palavra_chave'])
+        #print(dado['total'])
         #print('Somente a primeira posicao: ',dado['informacoes'][0][0])
-        print('\n')
+        #print('\n')
         # Formato das informações do dicionario
         '''
         dicionario = {  'palavra_chave':'exemplo',
