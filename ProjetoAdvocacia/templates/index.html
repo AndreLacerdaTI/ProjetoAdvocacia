@@ -16,7 +16,7 @@
 {% endblock %}
 {% block container %}
     <div class="loading" id="loading">
-        <img src="{{ url_for('static', filename='images/loading.gif') }}" alt="Carregando...">
+        <div class="custom-loader"></div>
         <h1>Processando...</h1>
         <h2>Não vai demorar muito</h2>
     </div>
@@ -27,22 +27,30 @@
             <button class="botao-sem-borda" title="Clique para fazer o download do arquivo"><img class="imagem-tipo" src="{{ url_for('static', filename='images/icone-pdf.png') }}"></button>
         </form>
         <h1 class="nome-arquivo">{{arquivo_selecionado}}</h1>
-        <h1>Total: {{informacoes['total']}}</h1>
-        <h3>A palavra-chave "{{informacoes['palavra-chave']}}" foi encontrada {{informacoes['quantidade']}} vezes</h3>
-        <table>
+        <div class="total" onclick="copiar_total()">
+            <h2>Total R$</h2>
+            <input class="input-total" id="input_total" type="text" title="Clique aqui para copiar o valor total"
+            value="{{informacoes['total']}}" readonly>
+            <img src="{{ url_for('static', filename='images/icone-copiar.png') }}" title="Clique aqui para copiar o valor total">
+        </div>
+        <h3>Identificamos {{informacoes['quantidade']}} referência(s) no arquivo.</h3>
+        <table class="tabela-detalhes">
             <thead>
                 <tr>
-                    <th title="Página do PDF onde o valor foi encontrado">Página</td>
-                    <th>Valor</td>
+                    <th>Página</td>
+                    <th>Orgão</td>
+                    <th>Projeto/Atividade</td>
+                    <th>Valor R$</td>
                 </tr>
             </thead>
             <tbody>
-                {% for dados in detalhes %}
-                    <td class="linha-valores" title="Página {{dados['pagina']}}">{{dados['pagina']}}</td>
-                    <td>{{dados['valor']}}</td>
-                    <td>{{dados['orgao']}}</td>
-                </tr>
-                {% endfor %}
+            {% for dados in dados_encontrados %}
+                <td title="Encontrado na página {{dados['pagina']}} do documento {{arquivo_selecionado}}">{{dados['pagina']}}</td>
+                <td>{{dados['orgao']}}</td>
+                <td>{{dados['palavra_chave']}}</td>
+                <td>R$ {{dados['valor']}}</td>
+            </tr>
+            {% endfor %}
             </tbody>
         </table>
     {% else %}
@@ -56,26 +64,26 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Descrição</td>
-                        <th>Total</td>
+                        <th>Orgão</td>
+                        <th>Projeto/Atividade</td>
                         <th>Detalhes</td>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for dados in dados_encontrados %}
-                        <td>{{dados['orgao']}}</td>
-                        <td>{{dados['palavra_chave']}}</td>
-                        <td>{{dados['total']}}</td>
-                        <td>
-                            <form method="post" action="{{ url_for('detalhar_valores') }}">
-                                <button onclick="mostrarLoading()" class="botao-tabela" name="palavras_chave" value="{{dados['palavra_chave']}}" title="Ver detalhes">
-                                    <img class="" src="{{ url_for('static', filename='images/icone-detalhes.png') }}">
-                                </button>
-                                <input type="text" class="esconder" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
+                {% for dados in dados_encontrados %}
+                <tr>
+                    <td>{{dados['orgao']}}</td>
+                    <td>{{dados['palavra_chave']}}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('detalhar_valores') }}">
+                            <button onclick="mostrarLoading()" class="botao-tabela" name="palavras_chave" value="{{dados['orgao']}}-{{dados['palavra_chave']}}" title="Ver detalhes">
+                                <img class="" src="{{ url_for('static', filename='images/icone-detalhes.png') }}">
+                            </button>
+                            <input type="text" class="esconder" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
                 </tbody>
             </table>
         {% else %} <!-- Se não estiver exibindo a tabela de valores, mostrar opções de filtros -->
@@ -193,6 +201,25 @@
 
             // Altera dinamicamente o caminho da imagem
             imagem.src = novoCaminho;
+        }
+    </script>
+    <script>
+        function copiar_total() {
+            // Seleciona o campo de texto
+            var campoTexto = document.getElementById("input_total");
+
+            // Seleciona o texto no campo de texto
+            campoTexto.select();
+            campoTexto.setSelectionRange(0, 99999); // Para dispositivos móveis
+
+            // Copia o texto para a área de transferência
+            document.execCommand("copy");
+
+            // Deseleciona o campo de texto
+            campoTexto.setSelectionRange(0, 0);
+
+            // Mensagem opcional (pode ser removida se não for necessária)
+            alert("Valor copiado para a área de transferência: " + campoTexto.value);
         }
     </script>
     <script>

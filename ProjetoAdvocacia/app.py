@@ -26,7 +26,7 @@ def apagar_arquivo(nome_arquivo):
 def converter_valores_reais(valores):
     valores_float = []
     #print(valores)
-    print(len(valores))
+    print('converter_valores_reais',len(valores))
     posicao = 0
     for valor in valores:
         if valor=='valor':
@@ -50,6 +50,8 @@ def converter_valores(valores):
         valor_sem_ponto = valor.replace('.', '')
         valor_convertido = valor_sem_ponto.replace(',', '.')
         valores_float.append(valor_convertido)
+    
+    print('converter_valores',valores_float)
     return valores_float
 
 # Soma de todos os valores encontrados

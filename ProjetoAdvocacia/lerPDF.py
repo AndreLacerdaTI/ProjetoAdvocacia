@@ -1,28 +1,3 @@
-'''
-import fitz  # PyMuPDF
-import re
-
-def extrair_valores_na_linha(pdf_path, palavra_chave):
-    doc = fitz.open(pdf_path)
-
-    for pagina_numero in range(doc.page_count):
-        pagina = doc[pagina_numero]
-        texto = pagina.get_text()
-        #print(texto)
-        if palavra_chave in texto:
-            # Encontrar a linha que contém a palavra-chave
-            linhas = texto.split(',')
-            for linha in linhas:
-                if palavra_chave in linha:
-                    # Extrair valores da mesma linha (usando regex neste exemplo)
-                    valores = re.findall(r'\d+', linha)
-                    print(f"Palavra-chave encontrada na página {pagina_numero + 1}, linha: {linha}")
-                    print("Valores encontrados:", valores)
-                    # Faça o que for necessário com os valores encontrados
-
-    doc.close()
-'''
-
 import fitz  # PyMuPDF
 import re
 
@@ -47,9 +22,32 @@ def buscar_titulo(pdf_path, titulos_procurados):
     # Fechar o arquivo PDF
     pdf_document.close()
 
+# Verificar se o valor encontrado é um valor em reais R$
+def verificar_valor(valor):
+    #print('verificar_valor {valor', valor)
+    if len(valor)>3:
+        # Se o antepenúltimo valor não for uma virgula (exemplo: 1.000[',']00)
+        if valor[-3]!=',':
+            return False
+        else:
+            #print('verificar_valor {valor[:2]', valor[:-2])
+            return True
+    return False
+
+# Se a verificação retornar False, ele irá tentar buscar outro valor na linha
+def encontrar_valores_reais(linhas,indice):
+    print('Encontramos erro para achar o valor de: ',linhas[indice])
+    for posicao in range(indice,indice+6):
+        valor = linhas[posicao]
+        if len(valor)>3:
+            if valor[-3]==',':
+                print('Encontramos o valor:', valor)
+                return valor
+            
 def buscar_descricao_e_valor(pdf_path, descricao):
     doc = fitz.open(pdf_path)
-    dados = [descricao]
+    #dados = [descricao]
+    dados = []
     dicionario = []
     for pagina_numero in range(doc.page_count):
         pagina = doc[pagina_numero]
@@ -62,82 +60,39 @@ def buscar_descricao_e_valor(pdf_path, descricao):
                 if linha=='Valor Orçado':
                     orgao = linhas[indice+1]
                 if descricao in linha:
+                    retorno = verificar_valor(linhas[indice+2])
+                    if retorno == False:
+                        valor = encontrar_valores_reais(linhas,indice)
+                    elif retorno == True:
+                        valor = linhas[indice+2]
                     #print(descricao)
                     #print(linha+' pagina: '+str(pagina_numero+1))
                     #print(linhas[indice+2])
-                    dados_encontrados = {'pagina':pagina_numero+1,'valor':linhas[indice+2], 'orgao':orgao}
+                    dados_encontrados = {'pagina':pagina_numero+1,'valor':valor, 'orgao':orgao, 'palavra_chave':descricao}
                     dicionario.append(dados_encontrados)
                     # Extrair valor da mesma linha (usando regex neste exemplo)
                 indice = indice+1
                     
     doc.close()
     dados.append(dicionario)
-    return dados
+    return dicionario
 
+def salvar_lista_valores(valores):
+    lista_valores = []
+    for valor in valores:
+        lista_valores.append(valor)
+    return lista_valores
 def dados_pdf(arquivo_selecionado, palavra_chave):
     if type(palavra_chave)==list:
         multiplos_dados = []
         for palavra in palavra_chave:
-            #print('teste',palavra_chave[0])
             dados = buscar_descricao_e_valor('static/arquivos/'+arquivo_selecionado,palavra)
-            #print(dados)
-            #buscar_titulo('static/arquivos/'+arquivo_selecionado,palavra)
-            valores = []
-            # Retira o a palavra chave da lista
-            palav_chave = dados[0]
-            dados.pop(0)
-            for dado in dados:
-                indice_dic = 0
-                for dic in dado:
-                    #print('Dados', dado[indice_dic])
-                    atual = dic['orgao']
-                    anterior = dado[indice_dic-1]['orgao']
-                    # Se o valor for o ultimo item da lista o proximo recebe o valor atual
-                    if len(dado)-1==indice_dic:
-                        proximo = dic['orgao']
-                    else:
-                        proximo = dado[indice_dic+1]['orgao']
-                    
-                    #  
-                    if atual == anterior:
-                        valores.append(dic['valor'])
-                    # Se o orgao atual é diferente do anterior: ele salva
-                    if atual != proximo and indice_dic!=0:
-                        valores_float = converter_valores(valores)
-                        total = somar_valores(valores_float)
-                        total_formatado = formatar_valor_real(total)
-                        relatorio = {'orgao':dado[indice_dic-1]['orgao'],
-                                    'palavra_chave':palav_chave,
-                                    'total':total_formatado
-                                    }
-                        print('Salvando',relatorio)
-                        multiplos_dados.append(relatorio)
-                        # Continuar 
-                        valores = []
-                        #print(dic['orgao'],dic['valor'])
-                        valores.append(dic['valor'])
-                    else:
-                        valores.append(dic['valor'])
-                        
-
-                    indice_dic += 1
-        print(multiplos_dados)
+            multiplos_dados.append(dados)
+        
+        #print(multiplos_dados[0])
         return multiplos_dados
     else:
-    # Faz a leitura e retorna os valores em dicionario
+        # Faz a leitura e retorna os valores em dicionario
         dados = buscar_descricao_e_valor('static/arquivos/'+arquivo_selecionado,palavra_chave)
-        valores = []
-        # Retira o a palavra chave da lista
-        nome = dados[0]
-        #print('Nome: ',nome)
-        dados.pop(0)
-        # Criando a lista de valores
-        for i in dados:
-            for dic in i:
-                #print(dic['valor'])
-                valores.append(dic['valor'])
-        # Somando e formatando o total
-        valores_float = converter_valores(valores)
-        total = somar_valores(valores_float)
-        total_real = formatar_valor_real(total)
-        return total_real, dados
+        lista = [dados]
+        return lista

@@ -91,30 +91,69 @@ def encontrar_valores():
     arquivo_selecionado = request.form['arquivo_selecionado']
     # Buscar no pdf
     dados = dados_pdf(arquivo_selecionado,palavras_chave)
-    for dado in dados:
-        #print(dado['palavra_chave'])
-        #print(dado['total'])
-        #print('Somente a primeira posicao: ',dado['informacoes'][0][0])
-        #print('\n')
-        # Formato das informações do dicionario
-        '''
-        dicionario = {  'palavra_chave':'exemplo',
-                        'total':'total',
-                        'informacoes': 'dicionario={'pagina':pagina,'valor':valor}'
-                        }'''
-    return render_template('index.html', arquivo_selecionado=arquivo_selecionado, dados_encontrados=dados)
+    if dados[-1]==[]:
+        print('Ultima posicao vazia, removendo')
+        dados.pop(-1)
+    palavras_chave_listadas = []
+    orgaos_listados = []
+    dados_encontrados = []
+    for palavra in dados:
+        #palavra = [{'pagina': 1, 'valor': '30.000,00', 'orgao': 'CHEFIA DE GABINETE', 'palavra_chave': 'Material de Consumo'}]
+        for dado in palavra:
+            if dado['orgao'] not in orgaos_listados and dado['palavra_chave'] not in palavras_chave_listadas:
+                #print(dado['orgao']+' E '+dado['palavra_chave']+' E '+dado['valor'])
+                orgao_palavra = {'orgao':dado['orgao'],
+                                     'palavra_chave':dado['palavra_chave'],
+                                     }
+                
+                dados_encontrados.append(orgao_palavra)
+                # Adiciona os às listadas para que não se repitam 
+                palavras_chave_listadas.append(dado['palavra_chave'])
+                orgaos_listados.append(dado['orgao'])
+                # Zera a lista para inciar uma nova busca em outro orgao
+            palavras_chave_listadas = []
+        orgaos_listados = []
+
+    return render_template('index.html', arquivo_selecionado=arquivo_selecionado, dados_encontrados=dados_encontrados)
 @app.route('/detalhar_valores', methods=['GET', 'POST'])
 def detalhar_valores():
+    # Recebe o orgao e a palavra chave no formato str(orgao-palavra)
     palavras_chave = request.form['palavras_chave']
+    # Separamos os valores
+    palavras_chave = palavras_chave.split('-')
+    orgao = palavras_chave[0]
+    palavras_chave = palavras_chave[1]
     arquivo_selecionado = request.form['arquivo_selecionado']
+    # Buscando todos os dados
     dados = dados_pdf(arquivo_selecionado,palavras_chave)
-    detalhes = dados[1][0]
+    print('retorno \n\n',dados)
+    #dados.pop(-1)
+    total = 0
+    valores = []
+    dados_detalhados = []
+    # Encontrando os valores
+    for palavra in dados:
+        for dado in palavra:
+            if dado['orgao']==orgao and dado['palavra_chave']==palavras_chave:
+                valores.append(dado['valor'])
+                detalhes = {'pagina': dado['pagina'],
+                            'valor': dado['valor'],
+                            'orgao': dado['orgao'],
+                            'palavra_chave': dado['palavra_chave']
+                            }
+                dados_detalhados.append(detalhes)
+    
+    valores_float = converter_valores(valores)
+    for valor in valores_float:
+        total = float(valor) + total
+    total = formatar_valor_real(total)
+
     informacoes = {
-        'quantidade':len(detalhes),
-        'total':dados[0],
-        'palavra-chave':palavras_chave
+        'quantidade':len(valores),
+        'total':total
     }
-    return render_template('index.html', arquivo_selecionado=arquivo_selecionado, detalhes_valores=True, informacoes=informacoes, detalhes=detalhes)
+
+    return render_template('index.html', arquivo_selecionado=arquivo_selecionado, detalhes_valores=True, informacoes=informacoes, dados_encontrados=dados_detalhados)
 
 UPLOAD_FOLDER_SLOT = 'static/arquivos'
 app.config['ALLOWED_EXTENSIONS'] = {'pdf', 'docx', 'doc'}

@@ -30,15 +30,11 @@ button {
     z-index: 1;
     align-items: center;
     text-align: center;
+    justify-content: center;
     padding: 300px 0;
 }
 .loading h1, .loading h2 {
     color: #fff;
-}
-
-.loading img {
-    width: 80px;
-    height: 80px;
 }
 
 .notificacao{
@@ -397,24 +393,89 @@ table tr:hover {
 table tr td form{
     width: 100%;
 }
+
 .botao-tabela {
-    color: #3034BE;
-    align-items: center;
-    width: 35%;
-    border: 0;
-    transition: 0.2s;
+  color: #3034BE;
+  align-items: center;
+  width: 35%;
+  border: 0;
+  transition: 0.2s;
 }
 .botao-tabela:hover {
-    width: 40%;
-    border: 0;
+  width: 40%;
+  border: 0;
 }
 .botao-tabela img {
-    width: 100%;
+  width: 100%;
 }
 
 .linha-valores{
-    height: 40px;
+  height: 40px;
 }
+
+/* Tabela detalhes */
+
+.tabela-detalhes {
+  width: 95%;
+  margin: 2.5%;
+}
+.tabela-detalhes tr th{
+  background-color: #3034BE;
+  color: #fff;
+  width: 25%;
+  height: 40px;
+}
+.tabela-detalhes tr td {
+  align-items: center;
+  text-align: center;
+  width: 25%;
+  height: 40px;
+  border: 1px solid #dddddd;
+}
+.tabela-detalhes tr:hover {
+  background-color: #3034BE20;
+}
+.tabela-detalhes tr td form{
+  width: 100%;
+}
+
+.total {
+  width: 30%;
+  margin-left: 35%;
+
+  align-items: center;
+  text-align: center;
+  border: 2px solid #3034BE;
+  border-radius: 20px;
+  display: flex;
+}
+
+.total h2 {
+  width: 30%;
+  height: auto;
+  padding: 10px 0px;
+  margin: 0;
+  border-radius: 16px 0px 0px 16px;
+  background-color: #3034BE;
+  color: #fff;
+}
+.input-total {
+  border-radius: 0px 0px 20px 20px;
+  border: 0;
+  width: 60%;
+  font-size: 30px;
+}
+.total img{
+  width: 5%;
+  opacity: 0.5;
+  margin: 0;
+  transition: 0.2s;
+}
+.total img:hover{
+  opacity: 1;
+}
+
+/**/
 
 
 /* Checkbox To Do */
@@ -670,4 +731,29 @@ table tr td form{
       opacity: 0;
       box-shadow: 0 -15px 0 0px #4F29F0, 14px -8px 0 0px #4F29F0, 14px 8px 0 0px #4F29F0, 0 15px 0 0px #4F29F0, -14px 8px 0 0px #4F29F0, -14px -8px 0 0px #4F29F0;
     }
+  }
+  .custom-loader {
+    margin: auto;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 8px solid #F4F4F4;
+    animation:
+      s10-1 0.8s infinite linear alternate,
+      s10-2 1.6s infinite linear;
+  }
+  @keyframes s10-1{
+     0%    {clip-path: polygon(50% 50%,0       0,  50%   0%,  50%    0%, 50%    0%, 50%    0%, 50%    0% )}
+     12.5% {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100%   0%, 100%   0%, 100%   0% )}
+     25%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 100% 100%, 100% 100% )}
+     50%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
+     62.5% {clip-path: polygon(50% 50%,100%    0, 100%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
+     75%   {clip-path: polygon(50% 50%,100% 100%, 100% 100%,  100% 100%, 100% 100%, 50%  100%, 0%   100% )}
+     100%  {clip-path: polygon(50% 50%,50%  100%,  50% 100%,   50% 100%,  50% 100%, 50%  100%, 0%   100% )}
+  }
+  @keyframes s10-2{ 
+    0%    {transform:scaleY(1)  rotate(0deg)}
+    49.99%{transform:scaleY(1)  rotate(135deg)}
+    50%   {transform:scaleY(-1) rotate(0deg)}
+    100%  {transform:scaleY(-1) rotate(-135deg)}
   }
