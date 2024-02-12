@@ -13,8 +13,13 @@ app = Flask(__name__)
 app.secret_key = 'key123'
 
 @app.route('/')
-def index():
+def home():
     session['ultima_tela'] = 'home'
+    return render_template('home.html')
+
+@app.route('/index')
+def index():
+    session['ultima_tela'] = 'index'
     arquivos_armazenados = listarDiretorio()
     return render_template('index.html',arquivos_armazenados=arquivos_armazenados)
 
@@ -25,9 +30,13 @@ def navegar():
     except:
         menu = session.get('ultima_tela', 'index')
     if menu == 'home':
+        return home()
+    if menu == 'index':
         return index()
     if menu == 'filtros':
         return filtros()
+    if menu == 'login':
+        return login()
 
 
 @app.route('/fechar_notificacao', methods=['GET', 'POST'])
@@ -39,6 +48,16 @@ def fechar_notificacao():
     #return render_template('%s.html'% ultima_tela)
     return navegar()
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    try:
+        username = request.form['username']
+        password = request.form['password']
+        print('Login')
+        print(username,password)
+        return index()
+    except:
+        return render_template('home.html',login=True)
 
 @app.route('/escolher_arquivo', methods=['GET', 'POST'])
 def escolher_arquivo():
@@ -168,6 +187,9 @@ def uploadDrop():
     if 'file' not in request.files:
         return render_template('index.html')
     file = request.files['file']
+    if file.filename == '':
+        session['notificacao'] = 'Nenhum arquivo foi selecionado'
+        return index()
     nome_arquivo = file.filename[-5:]
     tipo = nome_arquivo.split('.')
     tipo_arquivo = tipo[1]

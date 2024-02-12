@@ -1,8 +1,8 @@
-Enviar arquivo - retorna erro com drop
+Enviar arquivo - retorna erro com drop - OK versão com pagina inicial
 Adicionar palavras-chave individuais
 Grupos de arquivos e relatorios por prefeitura
 Exportar como pdf o relatorio
 
 Ver divisão das paginas e setores
 
-Pesquisar - maneiras de proteger o sistema para limitar o acesso
+Login e autenticação - Versão no Github

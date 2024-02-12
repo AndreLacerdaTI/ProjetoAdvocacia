@@ -76,6 +76,7 @@ button {
     text-align: center;
 }
 
+
 .form-adicionar{
     display: inline-block;
     height: 500px;
@@ -97,7 +98,6 @@ button {
 .logo{
     width: 80px;
     height: auto;
-    position: absolute;
     left: 0;
     top: 0;
     padding: 0.5px 10px;
@@ -105,20 +105,17 @@ button {
     border-radius: 0px;
     /**/
     background-color: #fff;
-    box-shadow: rgba(0, 0, 0, 0.12) 0px 5px 3px, rgba(0, 0, 0, 0.24) 0px 1px 0px;
 }
 
 .menu {
-    width: 90%;
+    width: 100%;
     height: 80px;
     background-color: #3034BE;
     color: #3034BE;
     display: flex;
     margin: 0;
-    margin-left: 100px;
     align-items: center;
     text-align: center;
-    padding: 0px 20px;
     /**/
     background-color: #fff;
     color: #3034BE45;
@@ -129,6 +126,12 @@ button {
 .menu h1{
     color: #3034BE;
     padding-right: 30px;
+}
+
+.menu .botao-color{
+  position: absolute;
+  right: 2px;
+  margin-top: 0;
 }
 
 .botoes-menu{
@@ -234,12 +237,14 @@ input::placeholder, textarea::placeholder {
     outline: none;
     align-items: center;
     text-align: center;
+    justify-content: center;
     color: #fff;
     background-color: #000000;
+    transition: 0.2s;
 }
 .botao-excluir-arquivos img {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     position: relative;
 }
 
@@ -475,7 +480,120 @@ table tr td form{
   opacity: 1;
 }
 
-/**/
+/* Login */
+
+.container-home{
+  padding: 0;
+  margin: 0;
+  color: #fff;
+  background-color: #3034BE;
+}
+
+.bloco div{
+  margin: 5% 30%;
+  padding: 15px;
+  position: absolute;
+  z-index: 1;
+  width: 40%;
+  height: auto;
+  background: linear-gradient(to bottom, #ffffff45, #ffffff10);
+  border: 2px solid #ffffff8a;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #00000077;
+}
+.bloco div h1, .bloco div h2, .bloco div h3{
+  color: #fff;
+}
+.bloco div img{
+  opacity: 1;
+  width: 80px;
+}
+
+.container-home img{
+  width: 100%;
+  height: auto;
+  opacity: 0.2;
+  /**/
+  opacity: 0.5;
+  z-index: 10;
+}
+.planos{
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  background-color: #fff;
+  padding: 20px 0px;
+}
+.planos .plano{
+  padding: 15px;
+  margin: 10px;
+  width: 150px;
+  height: 250px;
+  /*background: linear-gradient(to bottom, #ffffffab, #ffffff10);*/
+  background-color: #3034BE;
+  border: 2px solid #ffffff8a;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #00000077;
+  display: flex;
+  flex-direction: column;
+  justify-content:space-around;
+  align-items: center;
+  text-align: center;
+}
+.planos .plano h1,.planos .plano h2, .planos .plano h3, .planos .plano h4, .planos .plano h5{
+  margin: 6px;
+}
+
+.planos .plano div {
+  height: 80%;
+}
+
+.planos .plano button{
+  width: 100px;
+  border: 1px solid #fff;
+  font-weight: bold;
+  transition: 0.2s;
+}
+.planos .plano button:hover{
+  padding-top: 2px;
+  color: #3034BE;
+  background-color: #ffffff;
+  scale: 1.1;
+}
+
+.container-login{
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+}
+
+.form-login{
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.form-login input{
+  border: 1px solid #fff;
+  color: #fff;
+}
+
+.form-login .botao-color{
+  background-color: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  transition: 0.2s;
+}
+
+.form-login .botao-color:hover{
+  background-color: #ffffff;
+  color: #393939;
+}
 
 
 /* Checkbox To Do */
@@ -732,6 +850,8 @@ table tr td form{
       box-shadow: 0 -15px 0 0px #4F29F0, 14px -8px 0 0px #4F29F0, 14px 8px 0 0px #4F29F0, 0 15px 0 0px #4F29F0, -14px 8px 0 0px #4F29F0, -14px -8px 0 0px #4F29F0;
     }
   }
+
+  /* Loading */
   .custom-loader {
     margin: auto;
     width: 50px;
@@ -757,3 +877,42 @@ table tr td form{
     50%   {transform:scaleY(-1) rotate(0deg)}
     100%  {transform:scaleY(-1) rotate(-135deg)}
   }
+
+/* Login fundo */
+
+  .fundo-gradiente{
+    width: 100%;
+    height: 80vmax;
+    background: linear-gradient(90deg,#3034BE,#1500ff);
+    position: absolute;
+    z-index: 2;
+    align-items: center;
+    text-align: center;
+}
+
+
+  
+@import url('https://fonts.googleapis.com/css?family=Poppins:700');
+
+.blob {
+  position: relative;
+  top: 0;
+  left: 0;
+  /*fill: #ffffff42;*/
+  fill: none;
+  stroke: #ffffff50;
+  stroke-width: 2px;
+  width: 30vmax;
+  z-index: -1;
+  animation: move 10s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes move {
+  0%   { transform: scale(1)   translate(10px, -30px); stroke: #ffffff00; fill: #ffffff7a;}
+  38%  { transform: scale(0.8, 1) translate(80vw, 30vh) rotate(160deg); }
+  40%  { transform: scale(0.8, 1) translate(80vw, 30vh) rotate(160deg); stroke: #ffffff50; fill: #ffffff00;}
+  78%  { transform: scale(1.3) translate(0vw, 50vh) rotate(-20deg); }
+  80%  { transform: scale(1.3) translate(0vw, 50vh) rotate(-20deg); }
+  100% { transform: scale(1)   translate(10px, -30px); stroke: #ffffff00; fill: #ffffff7a;}
+}
