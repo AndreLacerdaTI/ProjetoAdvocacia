@@ -110,6 +110,9 @@ def encontrar_valores():
     arquivo_selecionado = request.form['arquivo_selecionado']
     # Buscar no pdf
     dados = dados_pdf(arquivo_selecionado,palavras_chave)
+    if dados==[]:
+        session['notificacao'] = 'Não encontramos nenhuma referência com os filtros selecionados!'
+        return render_template('index.html', arquivo_selecionado=arquivo_selecionado)
     if dados[-1]==[]:
         print('Ultima posicao vazia, removendo')
         dados.pop(-1)
