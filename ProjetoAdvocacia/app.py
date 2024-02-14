@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import locale
 
+from lerPDF import *
+from scripts.banco import *
 
 def listarDiretorio():
     # Diretório onde estão os arquivos
@@ -70,3 +72,35 @@ def formatar_valor_real(valor):
     valor_formatado = locale.currency(valor, grouping=True, symbol='R$')
 
     return valor_formatado
+
+
+def formatar_string_lista(lista_string):
+    lista = lista_string.replace('[','')
+    lista = lista.replace(']','')
+    lista = lista.replace(" '",'')
+    lista = lista.replace("'",'')
+    lista = lista.split(',')
+    return lista
+
+def dicionario_orgao_palavra(dados):
+    
+    palavras_chave_listadas = []
+    orgaos_listados = []
+    dados_encontrados = []
+    for palavra in dados:
+        #palavra = [{'pagina': 1, 'valor': '30.000,00', 'orgao': 'CHEFIA DE GABINETE', 'palavra_chave': 'Material de Consumo'}]
+        for dado in palavra:
+            if dado['orgao'] not in orgaos_listados and dado['palavra_chave'] not in palavras_chave_listadas:
+                #print(dado['orgao']+' E '+dado['palavra_chave']+' E '+dado['valor'])
+                orgao_palavra = {'orgao':dado['orgao'],
+                                     'palavra_chave':dado['palavra_chave'],
+                                     }
+                
+                dados_encontrados.append(orgao_palavra)
+                # Adiciona os às listadas para que não se repitam 
+                palavras_chave_listadas.append(dado['palavra_chave'])
+                orgaos_listados.append(dado['orgao'])
+                # Zera a lista para inciar uma nova busca em outro orgao
+            palavras_chave_listadas = []
+        orgaos_listados = []
+    return dados_encontrados

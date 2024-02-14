@@ -83,11 +83,41 @@ def escolher_arquivo():
     grupos = buscar_grupos()
     return render_template('index.html',arquivo_selecionado=arquivo_selecionado, tipo=tipo,grupos=grupos)
 
+
+@app.route('/parametro_filtros', methods=['GET', 'POST'])
+def parametro_filtros():
+    arquivo_selecionado = request.form['arquivo_selecionado']
+    filtros_encontrados = request.form['filtros_encontrados']
+    
+    lista = formatar_string_lista(filtros_encontrados)
+
+    palavras_selecionadas = []
+    # Verifica se existe checkbox marcado com os nomes dos filtros
+    for checkbox_name in lista:
+        try:
+            filtro_check = request.form[checkbox_name]
+            palavras_selecionadas.append(filtro_check)
+        except:
+            pass
+    parametro = buscar_titulo(arquivo_selecionado, palavras_selecionadas)
+    palavras_chave = buscar_nomes_filtros()
+    dados = dados_pdf(arquivo_selecionado,palavras_chave, parametro)
+    # Formata os dados em um dicionario
+    dados_encontrados = dicionario_orgao_palavra(dados)
+    return render_template('index.html', arquivo_selecionado=arquivo_selecionado, dados_encontrados=dados_encontrados)
+
 @app.route('/encontrar_valores', methods=['GET', 'POST'])
 def encontrar_valores():
+    # Receber o nome do arquivo selecionado
+    arquivo_selecionado = request.form['arquivo_selecionado']
+
     comando = request.form['comando']
+
     if comando=='todos':
         palavras_chave = buscar_nomes_filtros()
+    elif comando=='encontrar':
+        filtros_encontrados = buscar_valores_repetidos(arquivo_selecionado)
+        return render_template('index.html', orgaos_encontrados_automatico=True, filtros_encontrados=filtros_encontrados, arquivo_selecionado=arquivo_selecionado)
     else:
         palavras_chave_id = []
         # Busca todos os grupos personalizados
@@ -106,10 +136,9 @@ def encontrar_valores():
         # Formata a lista das palavras-chave para a consulta. Ex: palavras-chave = ['nome','nome2']
         for dado in dados:
             palavras_chave.append(dado[1])
-    # Receber o nome do arquivo selecionado
-    arquivo_selecionado = request.form['arquivo_selecionado']
+
     # Buscar no pdf
-    dados = dados_pdf(arquivo_selecionado,palavras_chave)
+    dados = dados_pdf(arquivo_selecionado,palavras_chave,'parametros')
     if dados==[]:
         session['notificacao'] = 'Não encontramos nenhuma referência com os filtros selecionados!'
         return render_template('index.html', arquivo_selecionado=arquivo_selecionado)
@@ -147,7 +176,7 @@ def detalhar_valores():
     palavras_chave = palavras_chave[1]
     arquivo_selecionado = request.form['arquivo_selecionado']
     # Buscando todos os dados
-    dados = dados_pdf(arquivo_selecionado,palavras_chave)
+    dados = dados_pdf(arquivo_selecionado,palavras_chave,'Valor Orçado')
     print('retorno \n\n',dados)
     #dados.pop(-1)
     total = 0
@@ -295,12 +324,16 @@ def preencher_grupo():
 def salvar_grupo():
     # Recebe os dados nome, descricao e se for uma alteração o id do grupo ['nome','descricao','grupo_id']
     dados_grupo = request.form['dados_grupo']
+    print('Antes:',dados_grupo)
+    dados = formatar_string_lista(dados_grupo)
+    """
     dados_grupo = dados_grupo.replace('[','')
     dados_grupo = dados_grupo.replace(']','')
     dados_grupo = dados_grupo.replace(" '",'')
     dados_grupo = dados_grupo.replace("'",'')
-    #print('dados_grupo 2 ',dados_grupo)
     dados = dados_grupo.split(',')
+    """
+    print('Depois:',dados)
     nome = dados[0]
     descricao = dados[1]
     print('descricao,',dados)

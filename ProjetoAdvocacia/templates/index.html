@@ -23,6 +23,24 @@
         <h1>Processando...</h1>
         <h2>Não vai demorar muito</h2>
     </div>
+    {% if orgaos_encontrados_automatico %}
+        <div class="fundo-branco">
+            <h1>Identificamos possíveis orgãos no documento</h1>
+            <h2>Precisamos da sua ajuda tornar a busca precisa</h2>
+            <h3>Por favor marque no mínimo 3 opções que correspondam aos orgãos que procura</h3>
+            <form class="form-adicionar" method="post" action="{{ url_for('parametro_filtros') }}">
+                <input type="text" class="esconder" name="filtros_encontrados" value="{{filtros_encontrados}}">
+                <input type="text" class="esconder" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
+                <button class="botao-color">Pronto</button>
+                {% for filtro in filtros_encontrados %}
+                <div class="checkbox-wrapper-11">
+                    <input id="{{filtro}}" type="checkbox" name="{{filtro}}" value="{{filtro}}">
+                    <label for="{{filtro}}">{{filtro}}</label>
+                </div>
+                {% endfor %}
+            </form>
+        </div>
+    {% endif %}
     {% if detalhes_valores %} <!-- Tabela dos valores detalhados da palavra-chave encontrada -->
         <br>
         <form method="post" action="{{ url_for('visualizar_pdf') }}">
@@ -109,6 +127,7 @@
                     <input class="esconder" type="text" id="arquivo_selecionado" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
                     <h1>Selecione uma opção de palavras-chave para realizar a busca no documento</h1>
                     <button class="botao-color" onclick="mostrarLoading()" name="comando" value="todos">Usar todas as palavras-chave</button><br>
+                    <button class="botao-color" onclick="mostrarLoading()" name="comando" value="encontrar">Realizar uma busca automática</button><br>
                     <h2>Grupos de palavras-chave</h2>
                     {% if grupos %}
                         {% for grupo in grupos %}
