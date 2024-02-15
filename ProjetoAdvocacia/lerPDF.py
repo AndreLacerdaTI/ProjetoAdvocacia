@@ -84,9 +84,7 @@ def buscar_titulo(pdf_path, titulos_procurados):
     return parametro
 
 def buscar_descricao_e_valor(pdf_path, descricao, parametro):
-    print('Parametro para busca', parametro)
-    #parametro = 'Valor Orçado'
-    print(parametro)
+    #print('Parametro para busca', parametro)
     doc = fitz.open(pdf_path)
     dados = []
     dicionario = []

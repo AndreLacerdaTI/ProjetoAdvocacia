@@ -25,13 +25,19 @@
     </div>
     {% if orgaos_encontrados_automatico %}
         <div class="fundo-branco">
-            <h1>Identificamos possíveis orgãos no documento</h1>
-            <h2>Precisamos da sua ajuda tornar a busca precisa</h2>
-            <h3>Por favor marque no mínimo 3 opções que correspondam aos orgãos que procura</h3>
+            <br>
+            <form method="post" action="{{ url_for('visualizar_pdf') }}">
+                <input type="text" class="esconder" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
+                <button class="botao-sem-borda" title="Clique para fazer o download do arquivo"><img class="imagem-tipo" src="{{ url_for('static', filename='images/icone-pdf.png') }}"></button>
+            </form>
+            <h1 class="nome-arquivo">{{arquivo_selecionado}}</h1>
+            <h2>Identificamos possíveis órgãos no documento e contamos</h2>
+            <h2>com a sua colaboração para aprimorar a precisão da busca.</h2>
             <form class="form-adicionar" method="post" action="{{ url_for('parametro_filtros') }}">
                 <input type="text" class="esconder" name="filtros_encontrados" value="{{filtros_encontrados}}">
                 <input type="text" class="esconder" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
                 <button class="botao-color">Pronto</button>
+                <h3>Por favor, selecione no mínimo três opções que correspondam a nomes de órgãos que você está procurando.</h3>
                 {% for filtro in filtros_encontrados %}
                 <div class="checkbox-wrapper-11">
                     <input id="{{filtro}}" type="checkbox" name="{{filtro}}" value="{{filtro}}">
@@ -101,6 +107,7 @@
                                 <img class="" src="{{ url_for('static', filename='images/icone-detalhes.png') }}">
                             </button>
                             <input type="text" class="esconder" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
+                            <input type="text" class="esconder" name="parametro" value="{{parametro}}">
                         </form>
                     </td>
                 </tr>
@@ -116,25 +123,23 @@
                 </form>
                 <h1 class="nome-arquivo">{{arquivo_selecionado}}</h1>
                 <form class="form-botoes-filtros" method="post" action="{{ url_for('encontrar_valores') }}">
-                    <!--<form class="form-voltar" method="post" action="{{ url_for('encontrar_valores') }}">
-                        <input type="text" name="palavra_chave" placeholder="Digite a palavra-chave">
-
-                        <input class="esconder" type="text" id="arquivo_selecionado" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
-                        <button onclick="mostrarLoading()">
-                            <img class="icone-botao-slot" src="{{ url_for('static', filename='images/icone-pesquisa.png') }}">
-                        </button>
-                    </form>-->
                     <input class="esconder" type="text" id="arquivo_selecionado" name="arquivo_selecionado" value="{{arquivo_selecionado}}">
+                    <input class="esconder" type="text" id="parametro" name="parametro" value="{{parametro}}">
                     <h1>Selecione uma opção de palavras-chave para realizar a busca no documento</h1>
                     <button class="botao-color" onclick="mostrarLoading()" name="comando" value="todos">Usar todas as palavras-chave</button><br>
-                    <button class="botao-color" onclick="mostrarLoading()" name="comando" value="encontrar">Realizar uma busca automática</button><br>
+                    <h2>Selecionar uma única Palavras-chave</h2>
+                    {% if palavras_chave %}
+                        {% for palavra in palavras_chave %}
+                            <button class="botao-filtros" onclick="mostrarLoading()" name="comando" value="palavra-{{palavra}}">{{palavra}}</button><br>
+                        {% endfor %}
+                    {% endif %}
+                    <br>
                     <h2>Grupos de palavras-chave</h2>
                     {% if grupos %}
                         {% for grupo in grupos %}
                             <button class="botao-filtros" onclick="mostrarLoading()" name="comando" value="{{grupo[0]}}">{{grupo[1]}}</button><br>
                         {% endfor %}
                     {% endif %}
-                    
                     <br>
                 </form>
             {% else %} <!-- Se nenhum arquivo estiver selecionado, mostrar tela de seleção  -->

@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for, send_file
 
-import os
+import os, time
 
 from app import *
 from word import *
@@ -61,6 +61,8 @@ def login():
 
 @app.route('/escolher_arquivo', methods=['GET', 'POST'])
 def escolher_arquivo():
+    # Atraso para a tela de loading
+    time.sleep(2)
     arquivo_selecionado = request.form['arquivo_selecionado']
     #print(arquivo_selecionado[:8])
     if arquivo_selecionado[:8]=='excluir-':
@@ -80,15 +82,14 @@ def escolher_arquivo():
         apagar_arquivo(arquivo_selecionado)
         session['notificacao'] = 'Tipo de arquivo inválido. Selecione arquivos com extensão .pdf ou .docx'
         return render_template('index.html')
-    grupos = buscar_grupos()
-    return render_template('index.html',arquivo_selecionado=arquivo_selecionado, tipo=tipo,grupos=grupos)
-
+    filtros_encontrados = buscar_valores_repetidos(arquivo_selecionado)
+    return render_template('index.html', orgaos_encontrados_automatico=True, filtros_encontrados=filtros_encontrados, arquivo_selecionado=arquivo_selecionado)
 
 @app.route('/parametro_filtros', methods=['GET', 'POST'])
 def parametro_filtros():
     arquivo_selecionado = request.form['arquivo_selecionado']
     filtros_encontrados = request.form['filtros_encontrados']
-    
+
     lista = formatar_string_lista(filtros_encontrados)
 
     palavras_selecionadas = []
@@ -99,25 +100,27 @@ def parametro_filtros():
             palavras_selecionadas.append(filtro_check)
         except:
             pass
+    if palavras_selecionadas==[] or len(palavras_selecionadas<2):
+        return escolher_arquivo()
     parametro = buscar_titulo(arquivo_selecionado, palavras_selecionadas)
     palavras_chave = buscar_nomes_filtros()
     dados = dados_pdf(arquivo_selecionado,palavras_chave, parametro)
     # Formata os dados em um dicionario
     dados_encontrados = dicionario_orgao_palavra(dados)
-    return render_template('index.html', arquivo_selecionado=arquivo_selecionado, dados_encontrados=dados_encontrados)
+    grupos = buscar_grupos()
+    return render_template('index.html', arquivo_selecionado=arquivo_selecionado, tipo='pdf', grupos=grupos, palavras_chave=palavras_chave, parametro=parametro)
 
 @app.route('/encontrar_valores', methods=['GET', 'POST'])
 def encontrar_valores():
     # Receber o nome do arquivo selecionado
     arquivo_selecionado = request.form['arquivo_selecionado']
-
+    parametro = request.form['parametro']
     comando = request.form['comando']
 
     if comando=='todos':
         palavras_chave = buscar_nomes_filtros()
-    elif comando=='encontrar':
-        filtros_encontrados = buscar_valores_repetidos(arquivo_selecionado)
-        return render_template('index.html', orgaos_encontrados_automatico=True, filtros_encontrados=filtros_encontrados, arquivo_selecionado=arquivo_selecionado)
+    elif comando[:8]=='palavra-':
+        palavras_chave = [comando[8:]]
     else:
         palavras_chave_id = []
         # Busca todos os grupos personalizados
@@ -138,45 +141,28 @@ def encontrar_valores():
             palavras_chave.append(dado[1])
 
     # Buscar no pdf
-    dados = dados_pdf(arquivo_selecionado,palavras_chave,'parametros')
-    if dados==[]:
-        session['notificacao'] = 'Não encontramos nenhuma referência com os filtros selecionados!'
-        return render_template('index.html', arquivo_selecionado=arquivo_selecionado)
+    dados = dados_pdf(arquivo_selecionado,palavras_chave, parametro)
     if dados[-1]==[]:
         print('Ultima posicao vazia, removendo')
         dados.pop(-1)
-    palavras_chave_listadas = []
-    orgaos_listados = []
-    dados_encontrados = []
-    for palavra in dados:
-        #palavra = [{'pagina': 1, 'valor': '30.000,00', 'orgao': 'CHEFIA DE GABINETE', 'palavra_chave': 'Material de Consumo'}]
-        for dado in palavra:
-            if dado['orgao'] not in orgaos_listados and dado['palavra_chave'] not in palavras_chave_listadas:
-                #print(dado['orgao']+' E '+dado['palavra_chave']+' E '+dado['valor'])
-                orgao_palavra = {'orgao':dado['orgao'],
-                                     'palavra_chave':dado['palavra_chave'],
-                                     }
-                
-                dados_encontrados.append(orgao_palavra)
-                # Adiciona os às listadas para que não se repitam 
-                palavras_chave_listadas.append(dado['palavra_chave'])
-                orgaos_listados.append(dado['orgao'])
-                # Zera a lista para inciar uma nova busca em outro orgao
-            palavras_chave_listadas = []
-        orgaos_listados = []
+    if dados==[]:
+        session['notificacao'] = 'Não encontramos nenhuma referência com os filtros selecionados!'
+        return render_template('index.html', arquivo_selecionado=arquivo_selecionado)
+    dados_encontrados = dicionario_orgao_palavra(dados)
 
-    return render_template('index.html', arquivo_selecionado=arquivo_selecionado, dados_encontrados=dados_encontrados)
+    return render_template('index.html', arquivo_selecionado=arquivo_selecionado, dados_encontrados=dados_encontrados, parametro=parametro)
 @app.route('/detalhar_valores', methods=['GET', 'POST'])
 def detalhar_valores():
     # Recebe o orgao e a palavra chave no formato str(orgao-palavra)
     palavras_chave = request.form['palavras_chave']
+    parametro = request.form['parametro']
     # Separamos os valores
     palavras_chave = palavras_chave.split('-')
     orgao = palavras_chave[0]
     palavras_chave = palavras_chave[1]
     arquivo_selecionado = request.form['arquivo_selecionado']
     # Buscando todos os dados
-    dados = dados_pdf(arquivo_selecionado,palavras_chave,'Valor Orçado')
+    dados = dados_pdf(arquivo_selecionado,palavras_chave, parametro)
     print('retorno \n\n',dados)
     #dados.pop(-1)
     total = 0
